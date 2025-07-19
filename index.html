@@ -423,7 +423,7 @@
 
       // --- Fungsi Utama ---
       async function loadInitialData() {
-        if (SPREADSHEET_WEB_APP_URL === "PASTE_YOUR_WEB_APP_URL_HERE") {
+        if (SPREADSHEET_WEB_APP_URL.includes("PASTE_YOUR_WEB_APP_URL_HERE")) {
           alert(
             "PENTING: Harap masukkan URL Web App Google Script Anda di dalam kode JavaScript (variabel SPREADSHEET_WEB_APP_URL) untuk menghubungkan ke spreadsheet."
           );
@@ -444,7 +444,8 @@
 
           // Tentukan ID siswa berikutnya
           if (students.length > 0) {
-            nextStudentId = Math.max(...students.map((s) => s.id)) + 1;
+            const maxId = Math.max(...students.map((s) => s.id || 0));
+            nextStudentId = maxId + 1;
           } else {
             nextStudentId = 1;
           }
@@ -472,11 +473,9 @@
           level: document.getElementById("studentLevel").value,
           classType: document.getElementById("studentClassType").value,
           createdAt: new Date().toISOString(),
-          // Data batch akan ditambahkan saat pembayaran
           activeBatch: null,
         };
 
-        // Kirim ke Spreadsheet
         const success = await saveDataToSheet("addStudent", newStudent);
         if (success) {
           students.push(newStudent);
@@ -515,20 +514,25 @@
           createdAt: new Date().toISOString(),
         };
 
+        // Kirim ke Spreadsheet. Aksi 'addPayment' di script sudah sekaligus
+        // memperbarui data 'activeBatch' siswa yang bersangkutan.
         const success = await saveDataToSheet("addPayment", newPayment);
+
         if (success) {
           payments.push(newPayment);
-          // Update data siswa dengan batch aktif baru
+
+          // Perbarui data siswa di state LOKAL agar UI langsung update dengan benar
           const student = students.find((s) => s.id === studentId);
           if (student) {
+            // FIX: Buat objek activeBatch yang LENGKAP untuk state lokal.
             student.activeBatch = {
               startDate: newPayment.startDate,
               studyDays: newPayment.studyDays,
               meetingsLeft: newPayment.meetingsLeft,
+              totalMeetings: newPayment.totalMeetings, // Ini yang sebelumnya hilang
             };
-            // Update data siswa di spreadsheet juga
-            await saveDataToSheet("updateStudent", student);
           }
+
           renderAll();
           e.target.reset();
           document.getElementById("paymentDate").valueAsDate = new Date();
@@ -548,9 +552,9 @@
           student.activeBatch.meetingsLeft--;
 
           if (student.activeBatch.meetingsLeft === 0) {
-            // Kelas selesai
-            student.activeBatch = null;
             alert(`Siswa ${student.name} telah menyelesaikan semua pertemuan.`);
+            // Hapus batch aktif setelah selesai
+            student.activeBatch = null;
           } else {
             alert(
               `Kehadiran ${student.name} dicatat. Sisa pertemuan: ${student.activeBatch.meetingsLeft}.`
@@ -606,11 +610,17 @@
             status === "Aktif"
               ? "bg-green-100 text-green-800"
               : "bg-red-100 text-red-800";
-          const schedule = batch
-            ? `${dayNames[batch.studyDays[0]]} & ${
-                dayNames[batch.studyDays[1]]
-              }`
-            : "-";
+
+          let schedule = "-";
+          if (
+            batch &&
+            Array.isArray(batch.studyDays) &&
+            batch.studyDays.length > 0
+          ) {
+            schedule = batch.studyDays
+              .map((dayIndex) => dayNames[dayIndex] || "")
+              .join(" & ");
+          }
 
           const row = `
                 <tr class="border-b hover:bg-gray-50">
@@ -657,8 +667,11 @@
         }
 
         todayClasses.forEach((s) => {
-          const meetingNumber =
-            s.activeBatch.totalMeetings - s.activeBatch.meetingsLeft + 1;
+          // FIX: Gunakan parseInt sebagai pengaman untuk memastikan kalkulasi berjalan
+          const totalMeetings = parseInt(s.activeBatch.totalMeetings, 10) || 0;
+          const meetingsLeft = parseInt(s.activeBatch.meetingsLeft, 10) || 0;
+          const meetingNumber = totalMeetings - meetingsLeft + 1;
+
           const row = `
                 <tr class="border-b hover:bg-gray-50">
                     <td class="p-4 font-semibold text-gray-800">${s.name}</td>
@@ -667,9 +680,7 @@
                         ? "bg-blue-100 text-blue-800"
                         : "bg-purple-100 text-purple-800"
                     }">${s.classType}</span></td>
-                    <td class="p-4">${meetingNumber} dari ${
-            s.activeBatch.totalMeetings
-          }</td>
+                    <td class="p-4">${meetingNumber} dari ${totalMeetings}</td>
                     <td class="p-4"><button onclick="handleMarkAttendance(${
                       s.id
                     })" class="bg-green-500 text-white font-bold py-1 px-3 rounded hover:bg-green-600">Catat Hadir</button></td>
@@ -709,6 +720,7 @@
           (s) =>
             s.activeBatch &&
             s.activeBatch.meetingsLeft > 0 &&
+            Array.isArray(s.activeBatch.studyDays) &&
             s.activeBatch.studyDays.includes(todayDayOfWeek)
         );
       }
@@ -721,7 +733,8 @@
             {
               method: "POST",
               mode: "cors",
-              headers: { "Content-Type": "text/plain" }, // Sesuai dengan Apps Script
+              // Apps Script lebih baik menerima 'text/plain' untuk postData.contents
+              headers: { "Content-Type": "text/plain" },
               body: JSON.stringify(data),
             }
           );
