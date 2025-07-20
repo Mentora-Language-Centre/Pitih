@@ -536,7 +536,7 @@
       // --- State Aplikasi ---
       let students = [];
       let payments = [];
-      let expenses = []; // BARU: State untuk pengeluaran
+      let expenses = [];
       let nextStudentId = 1;
       const dayNames = [
         "Minggu",
@@ -559,7 +559,7 @@
         setupEventListeners();
         loadInitialData();
         document.getElementById("paymentDate").valueAsDate = new Date();
-        document.getElementById("expenseDate").valueAsDate = new Date(); // BARU
+        document.getElementById("expenseDate").valueAsDate = new Date();
       }
 
       function setupEventListeners() {
@@ -574,7 +574,7 @@
           .addEventListener("submit", handleAddPayment);
         document
           .getElementById("addExpenseForm")
-          .addEventListener("submit", handleAddExpense); // BARU
+          .addEventListener("submit", handleAddExpense);
       }
 
       // --- Fungsi Otentikasi ---
@@ -583,14 +583,11 @@
         const inputCode = document.getElementById("access-code").value;
         const errorP = document.getElementById("access-error");
         errorP.textContent = "";
-
         if (!inputCode) {
           errorP.textContent = "Kode akses tidak boleh kosong.";
           return;
         }
-
         const hashedInput = await sha256(inputCode);
-
         if (hashedInput === CORRECT_HASH) {
           document.getElementById("access-modal").style.display = "none";
           document.getElementById("main-app").style.display = "block";
@@ -611,18 +608,15 @@
           if (!response.ok)
             throw new Error(`HTTP error! status: ${response.status}`);
           const data = await response.json();
-
           students = data.students || [];
           payments = data.payments || [];
-          expenses = data.expenses || []; // BARU: Muat data pengeluaran
-
+          expenses = data.expenses || [];
           if (students.length > 0) {
             const maxId = Math.max(...students.map((s) => s.id || 0));
             nextStudentId = maxId + 1;
           } else {
             nextStudentId = 1;
           }
-
           console.log("Data berhasil dimuat:", {
             students,
             payments,
@@ -652,7 +646,6 @@
           createdAt: new Date().toISOString(),
           activeBatch: null,
         };
-
         const success = await saveDataToSheet("addStudent", newStudent);
         if (success) {
           students.push(newStudent);
@@ -674,7 +667,6 @@
           alert("Silakan pilih siswa terlebih dahulu.");
           return;
         }
-
         const totalMeetings = parseInt(
           document.getElementById("totalMeetings").value
         );
@@ -690,7 +682,6 @@
           meetingsLeft: totalMeetings,
           createdAt: new Date().toISOString(),
         };
-
         const success = await saveDataToSheet("addPayment", newPayment);
         if (success) {
           payments.push(newPayment);
@@ -712,10 +703,10 @@
         }
       }
 
-      // BARU: Fungsi untuk menangani penambahan pengeluaran
+      // DIUBAH: Fungsi ini sekarang akan membuat objek yang konsisten dengan data dari sheet
       async function handleAddExpense(e) {
         e.preventDefault();
-        const newExpense = {
+        const newExpenseData = {
           date: document.getElementById("expenseDate").value,
           category: document.getElementById("expenseCategory").value,
           description: document.getElementById("expenseDescription").value,
@@ -724,18 +715,27 @@
         };
 
         if (
-          !newExpense.category ||
-          !newExpense.amount ||
-          !newExpense.description
+          !newExpenseData.category ||
+          !newExpenseData.amount ||
+          !newExpenseData.description
         ) {
           alert("Harap isi semua field pengeluaran.");
           return;
         }
 
-        const success = await saveDataToSheet("addExpense", newExpense);
+        const success = await saveDataToSheet("addExpense", newExpenseData);
         if (success) {
-          expenses.push(newExpense);
-          renderExpensesTable();
+          // Buat objek baru untuk array 'expenses' lokal dengan properti yang benar
+          const expenseForLocalRender = {
+            tanggal: newExpenseData.date,
+            kategori: newExpenseData.category,
+            deskripsi: newExpenseData.description,
+            jumlah: newExpenseData.amount,
+            createdAt: newExpenseData.createdAt,
+          };
+          expenses.push(expenseForLocalRender);
+
+          renderExpensesTable(); // Panggil render
           e.target.reset();
           document.getElementById("expenseDate").valueAsDate = new Date();
           alert("Pengeluaran berhasil dicatat!");
@@ -752,7 +752,6 @@
           student.activeBatch.meetingsLeft > 0
         ) {
           student.activeBatch.meetingsLeft--;
-
           if (student.activeBatch.meetingsLeft === 0) {
             alert(`Siswa ${student.name} telah menyelesaikan semua pertemuan.`);
             student.activeBatch = null;
@@ -761,7 +760,6 @@
               `Kehadiran ${student.name} dicatat. Sisa pertemuan: ${student.activeBatch.meetingsLeft}.`
             );
           }
-
           const success = await saveDataToSheet("updateStudent", student);
           if (success) {
             renderAll();
@@ -778,7 +776,7 @@
         renderStudentsTable();
         renderClassesTable();
         updatePaymentStudentOptions();
-        renderExpensesTable(); // BARU
+        renderExpensesTable();
       }
 
       function formatCurrency(amount) {
@@ -818,7 +816,6 @@
             status === "Aktif"
               ? "bg-green-100 text-green-800"
               : "bg-red-100 text-red-800";
-
           let schedule = "-";
           if (
             batch &&
@@ -829,7 +826,6 @@
               .map((dayIndex) => dayNames[dayIndex] || "")
               .join(" & ");
           }
-
           const row = `
                 <tr class="border-b hover:bg-gray-50">
                     <td class="p-4">${s.id}</td>
@@ -855,7 +851,7 @@
         });
       }
 
-      // BARU: Fungsi untuk render tabel pengeluaran
+      // DIUBAH: Fungsi ini sekarang menggunakan nama properti yang benar
       function renderExpensesTable() {
         const tbody = document.getElementById("expensesTable");
         tbody.innerHTML = "";
@@ -865,24 +861,28 @@
         }
 
         const sortedExpenses = [...expenses].sort(
-          (a, b) => new Date(b.date) - new Date(a.date)
+          (a, b) => new Date(b.tanggal) - new Date(a.tanggal)
         );
 
         sortedExpenses.forEach((exp) => {
-          const expenseDate = new Date(exp.date).toLocaleDateString("id-ID", {
-            day: "2-digit",
-            month: "long",
-            year: "numeric",
-          });
+          if (!exp.tanggal) return; // Lewati jika data tanggal tidak ada
+          const expenseDate = new Date(exp.tanggal).toLocaleDateString(
+            "id-ID",
+            {
+              day: "2-digit",
+              month: "long",
+              year: "numeric",
+            }
+          );
           const row = `
                 <tr class="border-b hover:bg-gray-50">
                     <td class="p-4">${expenseDate}</td>
                     <td class="p-4 font-semibold text-gray-800">${
-                      exp.category
+                      exp.kategori
                     }</td>
-                    <td class="p-4">${exp.description}</td>
+                    <td class="p-4">${exp.deskripsi}</td>
                     <td class="p-4 font-semibold text-red-600">${formatCurrency(
-                      exp.amount
+                      exp.jumlah
                     )}</td>
                 </tr>
             `;
@@ -912,7 +912,6 @@
           const totalMeetings = parseInt(s.activeBatch.totalMeetings, 10) || 0;
           const meetingsLeft = parseInt(s.activeBatch.meetingsLeft, 10) || 0;
           const meetingNumber = totalMeetings - meetingsLeft + 1;
-
           const row = `
                 <tr class="border-b hover:bg-gray-50">
                     <td class="p-4 font-semibold text-gray-800">${s.name}</td>
