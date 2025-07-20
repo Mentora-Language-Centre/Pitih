@@ -33,7 +33,6 @@
     </style>
   </head>
   <body>
-    <!-- Access Code Modal -->
     <div
       id="access-modal"
       class="fixed inset-0 bg-gray-900 bg-opacity-90 z-50 flex items-center justify-center p-4"
@@ -67,7 +66,6 @@
       </div>
     </div>
 
-    <!-- Loading Spinner -->
     <div
       id="loading-overlay"
       class="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center"
@@ -79,7 +77,6 @@
       <p class="ml-4 text-white text-xl">Menganalisis data...</p>
     </div>
 
-    <!-- Payment History Modal -->
     <div
       id="payment-history-modal"
       class="fixed inset-0 bg-black bg-opacity-60 z-30 flex items-center justify-center p-4"
@@ -144,16 +141,13 @@
               <tbody
                 id="modal-payments-table"
                 class="bg-white divide-y divide-gray-200"
-              >
-                <!-- Riwayat akan diisi oleh JavaScript -->
-              </tbody>
+              ></tbody>
             </table>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Main App Container -->
     <div id="main-app-container" class="p-4 sm:p-6 lg:p-8">
       <header class="mb-6 flex justify-between items-center">
         <div>
@@ -164,7 +158,6 @@
         </div>
       </header>
 
-      <!-- Navigation Tabs -->
       <nav class="flex border-b border-gray-200">
         <button
           data-tab="analytics"
@@ -181,9 +174,7 @@
       </nav>
 
       <main class="mt-6">
-        <!-- Analytics Tab -->
         <div id="analytics" class="tab-content active">
-          <!-- Key Metrics -->
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="bg-white p-6 rounded-2xl shadow-md">
               <h3 class="text-sm font-medium text-gray-500">
@@ -198,24 +189,24 @@
             </div>
             <div class="bg-white p-6 rounded-2xl shadow-md">
               <h3 class="text-sm font-medium text-gray-500">
-                Pemasukan (Total)
+                Pengeluaran (Bulan Ini)
               </h3>
               <p
-                class="text-3xl font-bold text-indigo-600 mt-2"
-                id="incomeAllTime"
+                class="text-3xl font-bold text-red-600 mt-2"
+                id="expenseThisMonth"
               >
                 Rp 0
               </p>
             </div>
             <div class="bg-white p-6 rounded-2xl shadow-md">
               <h3 class="text-sm font-medium text-gray-500">
-                Siswa Baru (Bulan Ini)
+                Laba/Rugi (Bulan Ini)
               </h3>
               <p
-                class="text-3xl font-bold text-blue-600 mt-2"
-                id="newStudentsThisMonth"
+                class="text-3xl font-bold text-indigo-600 mt-2"
+                id="profitThisMonth"
               >
-                0
+                Rp 0
               </p>
             </div>
             <div class="bg-white p-6 rounded-2xl shadow-md">
@@ -231,14 +222,13 @@
             </div>
           </div>
 
-          <!-- Charts -->
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
             <div class="bg-white p-6 rounded-2xl shadow-md">
               <h3 class="text-lg font-semibold text-gray-800">
-                Grafik Pemasukan Bulanan
+                Grafik Pemasukan vs Pengeluaran
               </h3>
               <div class="chart-container mt-4">
-                <canvas id="incomeChart"></canvas>
+                <canvas id="financialChart"></canvas>
               </div>
             </div>
             <div class="bg-white p-6 rounded-2xl shadow-md">
@@ -252,7 +242,6 @@
           </div>
         </div>
 
-        <!-- Students Management Tab -->
         <div id="students" class="tab-content">
           <div class="bg-white p-6 rounded-2xl shadow-md">
             <h3 class="text-lg font-semibold text-gray-800 mb-4">
@@ -292,9 +281,7 @@
                 <tbody
                   id="allStudentsTable"
                   class="bg-white divide-y divide-gray-200"
-                >
-                  <!-- Data Siswa akan diisi oleh JavaScript -->
-                </tbody>
+                ></tbody>
               </table>
             </div>
           </div>
@@ -312,7 +299,8 @@
       // --- State ---
       let students = [];
       let payments = [];
-      let incomeChartInstance = null;
+      let expenses = []; // BARU: State untuk pengeluaran
+      let financialChartInstance = null; // DIUBAH: Nama instance chart
       let studentGrowthChartInstance = null;
 
       // --- Event Listeners ---
@@ -368,8 +356,13 @@
 
           students = data.students || [];
           payments = data.payments || [];
+          expenses = data.expenses || []; // BARU: Muat data pengeluaran
 
-          console.log("Data loaded for dashboard:", { students, payments });
+          console.log("Data loaded for dashboard:", {
+            students,
+            payments,
+            expenses,
+          });
           processAndRenderDashboard();
         } catch (error) {
           console.error("Gagal memuat data:", error);
@@ -382,18 +375,24 @@
       }
 
       function processAndRenderDashboard() {
+        // Pastikan amount adalah number
         payments.forEach((p) => (p.amount = Number(p.amount) || 0));
+        expenses.forEach((e) => (e.amount = Number(e.amount) || 0));
 
-        // Render Analytics Tab
         calculateMetrics();
-        renderIncomeChart();
+        renderFinancialChart(); // DIUBAH: Memanggil fungsi chart baru
         renderStudentGrowthChart();
-
-        // Render Students Tab
         renderAllStudentsTable();
       }
 
       function formatCurrency(amount) {
+        const style = amount < 0 ? "text-red-600" : "text-green-600";
+        if (document.getElementById("profitThisMonth")) {
+          // Cek elemen sebelum styling
+          document.getElementById(
+            "profitThisMonth"
+          ).className = `text-3xl font-bold mt-2 ${style}`;
+        }
         return new Intl.NumberFormat("id-ID", {
           style: "currency",
           currency: "IDR",
@@ -418,19 +417,25 @@
         document.getElementById("incomeThisMonth").textContent =
           formatCurrency(incomeThisMonth);
 
-        const incomeAllTime = payments.reduce((sum, p) => sum + p.amount, 0);
-        document.getElementById("incomeAllTime").textContent =
-          formatCurrency(incomeAllTime);
+        // BARU: Hitung pengeluaran bulan ini
+        const expenseThisMonth = expenses
+          .filter((e) => {
+            const expenseDate = new Date(e.date);
+            return (
+              expenseDate.getMonth() === currentMonth &&
+              expenseDate.getFullYear() === currentYear
+            );
+          })
+          .reduce((sum, e) => sum + e.amount, 0);
+        document.getElementById("expenseThisMonth").textContent =
+          formatCurrency(expenseThisMonth);
 
-        const newStudentsThisMonth = students.filter((s) => {
-          const studentDate = new Date(s.createdAt);
-          return (
-            studentDate.getMonth() === currentMonth &&
-            studentDate.getFullYear() === currentYear
-          );
-        }).length;
-        document.getElementById("newStudentsThisMonth").textContent =
-          newStudentsThisMonth;
+        // BARU: Hitung laba/rugi bulan ini
+        const profitThisMonth = incomeThisMonth - expenseThisMonth;
+        const profitElement = document.getElementById("profitThisMonth");
+        profitElement.textContent = formatCurrency(profitThisMonth);
+        profitElement.classList.toggle("text-red-600", profitThisMonth < 0);
+        profitElement.classList.toggle("text-indigo-600", profitThisMonth >= 0);
 
         const totalActiveStudents = students.filter(
           (s) => s.activeBatch && s.activeBatch.meetingsLeft > 0
@@ -439,7 +444,7 @@
           totalActiveStudents;
       }
 
-      function getMonthlyData(data, dateField, valueField = null) {
+      function getMonthlyData(data, dateField, valueField) {
         const monthlyAgg = {};
         data.forEach((item) => {
           if (!item[dateField]) return;
@@ -455,9 +460,16 @@
         return monthlyAgg;
       }
 
-      function renderIncomeChart() {
+      // DIUBAH: Fungsi ini sekarang menampilkan pemasukan dan pengeluaran
+      function renderFinancialChart() {
         const monthlyIncome = getMonthlyData(payments, "createdAt", "amount");
-        const sortedMonths = Object.keys(monthlyIncome).sort();
+        const monthlyExpenses = getMonthlyData(expenses, "date", "amount");
+
+        const allMonths = new Set([
+          ...Object.keys(monthlyIncome),
+          ...Object.keys(monthlyExpenses),
+        ]);
+        const sortedMonths = Array.from(allMonths).sort();
 
         const labels = sortedMonths.map((month) =>
           new Date(month + "-02").toLocaleDateString("id-ID", {
@@ -465,22 +477,33 @@
             year: "numeric",
           })
         );
-        const data = sortedMonths.map((month) => monthlyIncome[month]);
+        const incomeData = sortedMonths.map(
+          (month) => monthlyIncome[month] || 0
+        );
+        const expenseData = sortedMonths.map(
+          (month) => monthlyExpenses[month] || 0
+        );
 
-        const ctx = document.getElementById("incomeChart").getContext("2d");
-        if (incomeChartInstance) incomeChartInstance.destroy();
-        incomeChartInstance = new Chart(ctx, {
-          type: "line",
+        const ctx = document.getElementById("financialChart").getContext("2d");
+        if (financialChartInstance) financialChartInstance.destroy();
+        financialChartInstance = new Chart(ctx, {
+          type: "bar", // DIUBAH ke 'bar' untuk perbandingan yang lebih baik
           data: {
             labels: labels,
             datasets: [
               {
                 label: "Pemasukan",
-                data: data,
-                borderColor: "rgb(79, 70, 229)",
-                backgroundColor: "rgba(79, 70, 229, 0.1)",
-                fill: true,
-                tension: 0.4,
+                data: incomeData,
+                backgroundColor: "rgba(34, 197, 94, 0.7)", // Hijau
+                borderColor: "rgb(22, 163, 74)",
+                borderWidth: 1,
+              },
+              {
+                label: "Pengeluaran",
+                data: expenseData,
+                backgroundColor: "rgba(239, 68, 68, 0.7)", // Merah
+                borderColor: "rgb(220, 38, 38)",
+                borderWidth: 1,
               },
             ],
           },
@@ -492,7 +515,10 @@
                 beginAtZero: true,
                 ticks: {
                   callback: function (value) {
-                    return formatCurrency(value);
+                    return new Intl.NumberFormat("id-ID", {
+                      notation: "compact",
+                      compactDisplay: "short",
+                    }).format(value);
                   },
                 },
               },
@@ -525,8 +551,8 @@
               {
                 label: "Siswa Baru",
                 data: data,
-                backgroundColor: "rgb(34, 197, 94)",
-                borderColor: "rgb(22, 163, 74)",
+                backgroundColor: "rgb(79, 70, 229)",
+                borderColor: "rgb(67, 56, 202)",
                 borderWidth: 1,
               },
             ],
@@ -542,7 +568,6 @@
       function renderAllStudentsTable() {
         const tbody = document.getElementById("allStudentsTable");
         tbody.innerHTML = "";
-
         if (students.length === 0) {
           tbody.innerHTML = `<tr><td colspan="5" class="text-center p-4 text-gray-500">Belum ada data siswa.</td></tr>`;
           return;
@@ -556,26 +581,25 @@
           );
 
           const row = `
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${
-                          s.id
-                        }</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">${
-                          s.name
-                        }</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${
-                          s.level
-                        }</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-semibold">${formatCurrency(
-                          totalPaid
-                        )}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <button onclick="showPaymentHistory(${
-                              s.id
-                            })" class="text-indigo-600 hover:text-indigo-900">Lihat Riwayat</button>
-                        </td>
-                    </tr>
-                `;
+            <tr>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${
+                  s.id
+                }</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">${
+                  s.name
+                }</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${
+                  s.level
+                }</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-semibold">${formatCurrency(
+                  totalPaid
+                )}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button onclick="showPaymentHistory(${
+                      s.id
+                    })" class="text-indigo-600 hover:text-indigo-900">Lihat Riwayat</button>
+                </td>
+            </tr>`;
           tbody.innerHTML += row;
         });
       }
@@ -607,20 +631,18 @@
               { day: "2-digit", month: "long", year: "numeric" }
             );
             const row = `
-                        <tr>
-                            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">${paymentDate}</td>
-                            <td class="px-4 py-4 whitespace-nowrap text-sm text-green-600 font-semibold">${formatCurrency(
-                              p.amount
-                            )}</td>
-                            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">${
-                              p.totalMeetings
-                            } Pertemuan</td>
-                        </tr>
-                    `;
+                <tr>
+                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">${paymentDate}</td>
+                    <td class="px-4 py-4 whitespace-nowrap text-sm text-green-600 font-semibold">${formatCurrency(
+                      p.amount
+                    )}</td>
+                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">${
+                      p.totalMeetings
+                    } Pertemuan</td>
+                </tr>`;
             historyBody.innerHTML += row;
           });
         }
-
         document.getElementById("payment-history-modal").style.display = "flex";
       }
 
@@ -629,7 +651,6 @@
           .querySelectorAll(".tab-content")
           .forEach((c) => c.classList.remove("active"));
         document.getElementById(tabName).classList.add("active");
-
         document.querySelectorAll(".nav-tab").forEach((t) => {
           const isSelected = t.dataset.tab === tabName;
           t.classList.toggle("text-indigo-600", isSelected);
