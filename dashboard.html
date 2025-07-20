@@ -6,6 +6,7 @@
     <title>Dasbor - Mentora Finance</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
@@ -158,7 +159,7 @@
         </div>
       </header>
 
-      <nav class="flex border-b border-gray-200">
+      <nav class="flex flex-wrap border-b border-gray-200">
         <button
           data-tab="analytics"
           class="nav-tab py-4 px-6 text-center font-semibold text-indigo-600 border-b-2 border-indigo-600"
@@ -171,14 +172,57 @@
         >
           👥 Manajemen Siswa
         </button>
+        <button
+          data-tab="reports"
+          class="nav-tab py-4 px-6 text-center font-semibold text-gray-500 hover:text-indigo-600"
+        >
+          📈 Laporan
+        </button>
       </nav>
 
       <main class="mt-6">
         <div id="analytics" class="tab-content active">
+          <div
+            class="bg-white p-4 rounded-2xl shadow-md mb-6 flex flex-wrap items-center gap-4"
+          >
+            <div class="flex-grow">
+              <label
+                for="filterStartDate"
+                class="text-sm font-medium text-gray-700"
+                >Tanggal Mulai</label
+              >
+              <input
+                type="date"
+                id="filterStartDate"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              />
+            </div>
+            <div class="flex-grow">
+              <label
+                for="filterEndDate"
+                class="text-sm font-medium text-gray-700"
+                >Tanggal Akhir</label
+              >
+              <input
+                type="date"
+                id="filterEndDate"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              />
+            </div>
+            <div class="pt-6">
+              <button
+                id="applyFilterBtn"
+                class="w-full bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700 transition duration-300"
+              >
+                Terapkan Filter
+              </button>
+            </div>
+          </div>
+
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="bg-white p-6 rounded-2xl shadow-md">
               <h3 class="text-sm font-medium text-gray-500">
-                Pemasukan (Bulan Ini)
+                Pemasukan (Filter)
               </h3>
               <p
                 class="text-3xl font-bold text-green-600 mt-2"
@@ -189,7 +233,7 @@
             </div>
             <div class="bg-white p-6 rounded-2xl shadow-md">
               <h3 class="text-sm font-medium text-gray-500">
-                Pengeluaran (Bulan Ini)
+                Pengeluaran (Filter)
               </h3>
               <p
                 class="text-3xl font-bold text-red-600 mt-2"
@@ -200,7 +244,7 @@
             </div>
             <div class="bg-white p-6 rounded-2xl shadow-md">
               <h3 class="text-sm font-medium text-gray-500">
-                Laba/Rugi (Bulan Ini)
+                Laba/Rugi (Filter)
               </h3>
               <p
                 class="text-3xl font-bold text-indigo-600 mt-2"
@@ -286,6 +330,99 @@
             </div>
           </div>
         </div>
+
+        <div id="reports" class="tab-content">
+          <div class="bg-white p-6 rounded-2xl shadow-md">
+            <div class="flex items-center gap-4 mb-6">
+              <label for="reportMonthSelector" class="font-semibold"
+                >Pilih Bulan Laporan:</label
+              >
+              <select
+                id="reportMonthSelector"
+                class="block w-full max-w-xs rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              ></select>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div>
+                <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">
+                  Detail Pemasukan
+                </h3>
+                <div class="overflow-x-auto">
+                  <table class="min-w-full">
+                    <thead class="bg-gray-50">
+                      <tr>
+                        <th
+                          class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase"
+                        >
+                          Tanggal
+                        </th>
+                        <th
+                          class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase"
+                        >
+                          Nama Siswa
+                        </th>
+                        <th
+                          class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase"
+                        >
+                          Jumlah
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody
+                      id="incomeReportTableBody"
+                      class="bg-white divide-y divide-gray-200"
+                    ></tbody>
+                    <tfoot class="bg-gray-100">
+                      <tr id="incomeReportTotalRow"></tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </div>
+
+              <div>
+                <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">
+                  Detail Pengeluaran
+                </h3>
+                <div class="overflow-x-auto">
+                  <table class="min-w-full">
+                    <thead class="bg-gray-50">
+                      <tr>
+                        <th
+                          class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase"
+                        >
+                          Tanggal
+                        </th>
+                        <th
+                          class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase"
+                        >
+                          Kategori
+                        </th>
+                        <th
+                          class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase"
+                        >
+                          Deskripsi
+                        </th>
+                        <th
+                          class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase"
+                        >
+                          Jumlah
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody
+                      id="expenseReportTableBody"
+                      class="bg-white divide-y divide-gray-200"
+                    ></tbody>
+                    <tfoot class="bg-gray-100">
+                      <tr id="expenseReportTotalRow"></tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </main>
     </div>
 
@@ -299,8 +436,8 @@
       // --- State ---
       let students = [];
       let payments = [];
-      let expenses = []; // BARU: State untuk pengeluaran
-      let financialChartInstance = null; // DIUBAH: Nama instance chart
+      let expenses = [];
+      let financialChartInstance = null;
       let studentGrowthChartInstance = null;
 
       // --- Event Listeners ---
@@ -317,11 +454,48 @@
             document.getElementById("payment-history-modal").style.display =
               "none";
           });
+        document
+          .getElementById("applyFilterBtn")
+          .addEventListener("click", handleFilterApply);
+        document
+          .getElementById("reportMonthSelector")
+          .addEventListener("change", renderReportTab);
       });
 
       // --- Functions ---
       function initializeDashboard() {
+        const today = new Date();
+        const firstDayOfMonth = new Date(
+          today.getFullYear(),
+          today.getMonth(),
+          1
+        );
+        const lastDayOfMonth = new Date(
+          today.getFullYear(),
+          today.getMonth() + 1,
+          0
+        );
+        document.getElementById("filterStartDate").value = firstDayOfMonth
+          .toISOString()
+          .split("T")[0];
+        document.getElementById("filterEndDate").value = lastDayOfMonth
+          .toISOString()
+          .split("T")[0];
         loadInitialData();
+      }
+
+      function handleFilterApply() {
+        const startDate = document.getElementById("filterStartDate").value;
+        const endDate = document.getElementById("filterEndDate").value;
+        if (!startDate || !endDate) {
+          alert("Harap pilih tanggal mulai dan tanggal akhir.");
+          return;
+        }
+        if (new Date(startDate) > new Date(endDate)) {
+          alert("Tanggal mulai tidak boleh lebih besar dari tanggal akhir.");
+          return;
+        }
+        processAndRenderDashboard();
       }
 
       async function handleAccessCodeSubmit(e) {
@@ -353,16 +527,9 @@
           if (!response.ok)
             throw new Error(`HTTP error! status: ${response.status}`);
           const data = await response.json();
-
           students = data.students || [];
           payments = data.payments || [];
-          expenses = data.expenses || []; // BARU: Muat data pengeluaran
-
-          console.log("Data loaded for dashboard:", {
-            students,
-            payments,
-            expenses,
-          });
+          expenses = data.expenses || [];
           processAndRenderDashboard();
         } catch (error) {
           console.error("Gagal memuat data:", error);
@@ -375,24 +542,17 @@
       }
 
       function processAndRenderDashboard() {
-        // Pastikan amount adalah number
         payments.forEach((p) => (p.amount = Number(p.amount) || 0));
-        expenses.forEach((e) => (e.amount = Number(e.amount) || 0));
-
+        expenses.forEach((e) => (e.jumlah = Number(e.jumlah) || 0));
         calculateMetrics();
-        renderFinancialChart(); // DIUBAH: Memanggil fungsi chart baru
+        renderFinancialChart();
         renderStudentGrowthChart();
         renderAllStudentsTable();
+        populateReportMonthSelector();
+        renderReportTab();
       }
 
       function formatCurrency(amount) {
-        const style = amount < 0 ? "text-red-600" : "text-green-600";
-        if (document.getElementById("profitThisMonth")) {
-          // Cek elemen sebelum styling
-          document.getElementById(
-            "profitThisMonth"
-          ).className = `text-3xl font-bold mt-2 ${style}`;
-        }
         return new Intl.NumberFormat("id-ID", {
           style: "currency",
           currency: "IDR",
@@ -401,42 +561,34 @@
       }
 
       function calculateMetrics() {
-        const now = new Date();
-        const currentMonth = now.getMonth();
-        const currentYear = now.getFullYear();
-
-        const incomeThisMonth = payments
+        const startDate = new Date(
+          document.getElementById("filterStartDate").value
+        );
+        const endDate = new Date(
+          document.getElementById("filterEndDate").value
+        );
+        endDate.setDate(endDate.getDate() + 1);
+        const incomeInRange = payments
           .filter((p) => {
             const paymentDate = new Date(p.createdAt);
-            return (
-              paymentDate.getMonth() === currentMonth &&
-              paymentDate.getFullYear() === currentYear
-            );
+            return paymentDate >= startDate && paymentDate < endDate;
           })
           .reduce((sum, p) => sum + p.amount, 0);
         document.getElementById("incomeThisMonth").textContent =
-          formatCurrency(incomeThisMonth);
-
-        // BARU: Hitung pengeluaran bulan ini
-        const expenseThisMonth = expenses
+          formatCurrency(incomeInRange);
+        const expenseInRange = expenses
           .filter((e) => {
-            const expenseDate = new Date(e.date);
-            return (
-              expenseDate.getMonth() === currentMonth &&
-              expenseDate.getFullYear() === currentYear
-            );
+            const expenseDate = new Date(e.tanggal);
+            return expenseDate >= startDate && expenseDate < endDate;
           })
-          .reduce((sum, e) => sum + e.amount, 0);
+          .reduce((sum, e) => sum + e.jumlah, 0);
         document.getElementById("expenseThisMonth").textContent =
-          formatCurrency(expenseThisMonth);
-
-        // BARU: Hitung laba/rugi bulan ini
-        const profitThisMonth = incomeThisMonth - expenseThisMonth;
+          formatCurrency(expenseInRange);
+        const profitInRange = incomeInRange - expenseInRange;
         const profitElement = document.getElementById("profitThisMonth");
-        profitElement.textContent = formatCurrency(profitThisMonth);
-        profitElement.classList.toggle("text-red-600", profitThisMonth < 0);
-        profitElement.classList.toggle("text-indigo-600", profitThisMonth >= 0);
-
+        profitElement.textContent = formatCurrency(profitInRange);
+        profitElement.classList.toggle("text-red-600", profitInRange < 0);
+        profitElement.classList.toggle("text-indigo-600", profitInRange >= 0);
         const totalActiveStudents = students.filter(
           (s) => s.activeBatch && s.activeBatch.meetingsLeft > 0
         ).length;
@@ -449,6 +601,7 @@
         data.forEach((item) => {
           if (!item[dateField]) return;
           const date = new Date(item[dateField]);
+          if (isNaN(date.getTime())) return;
           const monthKey = `${date.getFullYear()}-${String(
             date.getMonth() + 1
           ).padStart(2, "0")}`;
@@ -460,17 +613,52 @@
         return monthlyAgg;
       }
 
-      // DIUBAH: Fungsi ini sekarang menampilkan pemasukan dan pengeluaran
+      // DIUBAH: Fungsi ini sekarang lebih tangguh dalam memfilter tanggal
       function renderFinancialChart() {
-        const monthlyIncome = getMonthlyData(payments, "createdAt", "amount");
-        const monthlyExpenses = getMonthlyData(expenses, "date", "amount");
+        const startDate = new Date(
+          document.getElementById("filterStartDate").value
+        );
+        const endDate = new Date(
+          document.getElementById("filterEndDate").value
+        );
+        endDate.setDate(endDate.getDate() + 1);
 
+        const filteredPayments = payments.filter((p) => {
+          if (!p.createdAt) return false;
+          const paymentDate = new Date(p.createdAt);
+          return (
+            !isNaN(paymentDate.getTime()) &&
+            paymentDate >= startDate &&
+            paymentDate < endDate
+          );
+        });
+
+        const filteredExpenses = expenses.filter((e) => {
+          if (!e.tanggal) return false; // Pemeriksaan tambahan
+          const expenseDate = new Date(e.tanggal);
+          // Pemeriksaan tambahan untuk memastikan tanggal valid
+          return (
+            !isNaN(expenseDate.getTime()) &&
+            expenseDate >= startDate &&
+            expenseDate < endDate
+          );
+        });
+
+        const monthlyIncome = getMonthlyData(
+          filteredPayments,
+          "createdAt",
+          "amount"
+        );
+        const monthlyExpenses = getMonthlyData(
+          filteredExpenses,
+          "tanggal",
+          "jumlah"
+        );
         const allMonths = new Set([
           ...Object.keys(monthlyIncome),
           ...Object.keys(monthlyExpenses),
         ]);
         const sortedMonths = Array.from(allMonths).sort();
-
         const labels = sortedMonths.map((month) =>
           new Date(month + "-02").toLocaleDateString("id-ID", {
             month: "short",
@@ -483,25 +671,24 @@
         const expenseData = sortedMonths.map(
           (month) => monthlyExpenses[month] || 0
         );
-
         const ctx = document.getElementById("financialChart").getContext("2d");
         if (financialChartInstance) financialChartInstance.destroy();
         financialChartInstance = new Chart(ctx, {
-          type: "bar", // DIUBAH ke 'bar' untuk perbandingan yang lebih baik
+          type: "bar",
           data: {
             labels: labels,
             datasets: [
               {
                 label: "Pemasukan",
                 data: incomeData,
-                backgroundColor: "rgba(34, 197, 94, 0.7)", // Hijau
+                backgroundColor: "rgba(34, 197, 94, 0.7)",
                 borderColor: "rgb(22, 163, 74)",
                 borderWidth: 1,
               },
               {
                 label: "Pengeluaran",
                 data: expenseData,
-                backgroundColor: "rgba(239, 68, 68, 0.7)", // Merah
+                backgroundColor: "rgba(239, 68, 68, 0.7)",
                 borderColor: "rgb(220, 38, 38)",
                 borderWidth: 1,
               },
@@ -530,7 +717,6 @@
       function renderStudentGrowthChart() {
         const monthlyNewStudents = getMonthlyData(students, "createdAt");
         const sortedMonths = Object.keys(monthlyNewStudents).sort();
-
         const labels = sortedMonths.map((month) =>
           new Date(month + "-02").toLocaleDateString("id-ID", {
             month: "short",
@@ -538,7 +724,6 @@
           })
         );
         const data = sortedMonths.map((month) => monthlyNewStudents[month]);
-
         const ctx = document
           .getElementById("studentGrowthChart")
           .getContext("2d");
@@ -572,14 +757,12 @@
           tbody.innerHTML = `<tr><td colspan="5" class="text-center p-4 text-gray-500">Belum ada data siswa.</td></tr>`;
           return;
         }
-
         students.forEach((s) => {
           const studentPayments = payments.filter((p) => p.studentId == s.id);
           const totalPaid = studentPayments.reduce(
             (sum, p) => sum + p.amount,
             0
           );
-
           const row = `
             <tr>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${
@@ -604,24 +787,159 @@
         });
       }
 
+      function populateReportMonthSelector() {
+        const selector = document.getElementById("reportMonthSelector");
+        const existingValue = selector.value;
+        selector.innerHTML = "";
+        const monthSet = new Set();
+        payments.forEach((p) => {
+          const date = new Date(p.createdAt);
+          if (isNaN(date.getTime())) return;
+          monthSet.add(
+            `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+              2,
+              "0"
+            )}`
+          );
+        });
+        expenses.forEach((e) => {
+          const date = new Date(e.tanggal);
+          if (isNaN(date.getTime())) return;
+          monthSet.add(
+            `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+              2,
+              "0"
+            )}`
+          );
+        });
+        const sortedMonths = Array.from(monthSet).sort().reverse();
+        sortedMonths.forEach((monthKey) => {
+          const date = new Date(monthKey + "-02");
+          const option = document.createElement("option");
+          option.value = monthKey;
+          option.textContent = date.toLocaleDateString("id-ID", {
+            month: "long",
+            year: "numeric",
+          });
+          selector.appendChild(option);
+        });
+        if (existingValue && sortedMonths.includes(existingValue)) {
+          selector.value = existingValue;
+        }
+      }
+
+      function renderReportTab() {
+        const selectedMonth = document.getElementById(
+          "reportMonthSelector"
+        ).value;
+        if (!selectedMonth) {
+          renderIncomeReportTable([]);
+          renderExpenseReportTable([]);
+          return;
+        }
+        const [year, month] = selectedMonth.split("-").map(Number);
+        const filteredPayments = payments.filter((p) => {
+          const date = new Date(p.createdAt);
+          return date.getFullYear() === year && date.getMonth() + 1 === month;
+        });
+        const filteredExpenses = expenses.filter((e) => {
+          const date = new Date(e.tanggal);
+          return date.getFullYear() === year && date.getMonth() + 1 === month;
+        });
+        renderIncomeReportTable(filteredPayments);
+        renderExpenseReportTable(filteredExpenses);
+      }
+
+      function renderIncomeReportTable(data) {
+        const tbody = document.getElementById("incomeReportTableBody");
+        const tfoot = document.getElementById("incomeReportTotalRow");
+        tbody.innerHTML = "";
+        tfoot.innerHTML = "";
+        let totalIncome = 0;
+        if (data.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="3" class="text-center p-4 text-gray-500">Tidak ada pemasukan pada bulan ini.</td></tr>`;
+        } else {
+          data
+            .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+            .forEach((p) => {
+              const student = students.find((s) => s.id == p.studentId);
+              totalIncome += p.amount;
+              const row = `
+                <tr>
+                    <td class="px-4 py-2 text-sm text-gray-500">${new Date(
+                      p.createdAt
+                    ).toLocaleDateString("id-ID")}</td>
+                    <td class="px-4 py-2 text-sm text-gray-900">${
+                      student ? student.name : "Siswa Dihapus"
+                    }</td>
+                    <td class="px-4 py-2 text-sm text-green-600 font-semibold">${formatCurrency(
+                      p.amount
+                    )}</td>
+                </tr>`;
+              tbody.innerHTML += row;
+            });
+        }
+        tfoot.innerHTML = `
+            <td colspan="2" class="px-4 py-2 text-right font-bold text-gray-700">Total Pemasukan:</td>
+            <td class="px-4 py-2 font-bold text-green-700">${formatCurrency(
+              totalIncome
+            )}</td>
+        `;
+      }
+
+      function renderExpenseReportTable(data) {
+        const tbody = document.getElementById("expenseReportTableBody");
+        const tfoot = document.getElementById("expenseReportTotalRow");
+        tbody.innerHTML = "";
+        tfoot.innerHTML = "";
+        let totalExpense = 0;
+        if (data.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="4" class="text-center p-4 text-gray-500">Tidak ada pengeluaran pada bulan ini.</td></tr>`;
+        } else {
+          data
+            .sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal))
+            .forEach((e) => {
+              totalExpense += e.jumlah;
+              const row = `
+                <tr>
+                    <td class="px-4 py-2 text-sm text-gray-500">${new Date(
+                      e.tanggal
+                    ).toLocaleDateString("id-ID")}</td>
+                    <td class="px-4 py-2 text-sm text-gray-900">${
+                      e.kategori
+                    }</td>
+                    <td class="px-4 py-2 text-sm text-gray-700">${
+                      e.deskripsi
+                    }</td>
+                    <td class="px-4 py-2 text-sm text-red-600 font-semibold">${formatCurrency(
+                      e.jumlah
+                    )}</td>
+                </tr>`;
+              tbody.innerHTML += row;
+            });
+        }
+        tfoot.innerHTML = `
+            <td colspan="3" class="px-4 py-2 text-right font-bold text-gray-700">Total Pengeluaran:</td>
+            <td class="px-4 py-2 font-bold text-red-700">${formatCurrency(
+              totalExpense
+            )}</td>
+        `;
+      }
+
       function showPaymentHistory(studentId) {
         const student = students.find((s) => s.id == studentId);
         if (!student) return;
-
         document.getElementById(
           "modal-student-name"
         ).textContent = `Riwayat Pembayaran: ${student.name}`;
         document.getElementById(
           "modal-student-id"
         ).textContent = `ID Siswa: ${student.id}`;
-
         const historyBody = document.getElementById("modal-payments-table");
         historyBody.innerHTML = "";
-
         const studentPayments = payments
           .filter((p) => p.studentId == studentId)
           .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
         if (studentPayments.length === 0) {
           historyBody.innerHTML = `<tr><td colspan="3" class="text-center p-4 text-gray-500">Siswa ini belum pernah melakukan pembayaran.</td></tr>`;
         } else {
