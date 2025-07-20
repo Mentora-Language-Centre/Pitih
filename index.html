@@ -19,7 +19,6 @@
       .tab-content.active {
         display: block;
       }
-      /* Custom scrollbar for better UX */
       ::-webkit-scrollbar {
         width: 8px;
       }
@@ -33,14 +32,12 @@
       ::-webkit-scrollbar-thumb:hover {
         background: #4f46e5;
       }
-      /* Initially hide the main app */
       #main-app {
         display: none;
       }
     </style>
   </head>
   <body class="bg-gray-100">
-    <!-- Access Code Modal -->
     <div
       id="access-modal"
       class="fixed inset-0 bg-gray-900 bg-opacity-90 z-50 flex items-center justify-center p-4"
@@ -74,7 +71,6 @@
       </div>
     </div>
 
-    <!-- Loading Spinner -->
     <div
       id="loading-overlay"
       class="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center"
@@ -86,7 +82,6 @@
       <p class="ml-4 text-white text-xl">Memuat data...</p>
     </div>
 
-    <!-- Main Application Wrapper -->
     <div id="main-app">
       <div class="container mx-auto p-4 md:p-8 max-w-7xl">
         <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
@@ -99,7 +94,6 @@
             </p>
           </header>
 
-          <!-- Navigation Tabs -->
           <nav class="flex flex-wrap border-b border-gray-200 bg-gray-50">
             <button
               data-tab="dashboard"
@@ -120,6 +114,12 @@
               💰 Pembayaran
             </button>
             <button
+              data-tab="expenses"
+              class="nav-tab flex-1 py-4 px-2 text-center font-semibold text-gray-600 border-b-4 border-transparent hover:bg-gray-200 hover:text-indigo-600 transition duration-300"
+            >
+              💸 Pengeluaran
+            </button>
+            <button
               data-tab="classes"
               class="nav-tab flex-1 py-4 px-2 text-center font-semibold text-gray-600 border-b-4 border-transparent hover:bg-gray-200 hover:text-indigo-600 transition duration-300"
             >
@@ -128,7 +128,6 @@
           </nav>
 
           <main class="p-6 md:p-8">
-            <!-- Dashboard Tab -->
             <div id="dashboard" class="tab-content active">
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div class="card bg-blue-50 p-5 rounded-xl">
@@ -170,7 +169,6 @@
               </div>
             </div>
 
-            <!-- Students Tab -->
             <div id="students" class="tab-content">
               <div class="bg-gray-50 p-6 rounded-lg shadow-inner">
                 <h3 class="text-xl font-bold text-gray-800 mb-4">
@@ -181,7 +179,8 @@
                     <div>
                       <label class="font-semibold text-gray-700"
                         >Nama Siswa</label
-                      ><input
+                      >
+                      <input
                         type="text"
                         id="studentName"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
@@ -191,15 +190,16 @@
                     <div>
                       <label class="font-semibold text-gray-700"
                         >No. Telepon</label
-                      ><input
+                      >
+                      <input
                         type="tel"
                         id="studentPhone"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                       />
                     </div>
                     <div>
-                      <label class="font-semibold text-gray-700">Email</label
-                      ><input
+                      <label class="font-semibold text-gray-700">Email</label>
+                      <input
                         type="email"
                         id="studentEmail"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
@@ -210,7 +210,8 @@
                     <div>
                       <label class="font-semibold text-gray-700"
                         >Asal Sekolah</label
-                      ><input
+                      >
+                      <input
                         type="text"
                         id="studentSchool"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
@@ -219,7 +220,8 @@
                     <div>
                       <label class="font-semibold text-gray-700"
                         >Tingkatan</label
-                      ><select
+                      >
+                      <select
                         id="studentLevel"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                         required
@@ -234,7 +236,8 @@
                     <div>
                       <label class="font-semibold text-gray-700"
                         >Jenis Kelas</label
-                      ><select
+                      >
+                      <select
                         id="studentClassType"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                         required
@@ -289,7 +292,6 @@
               </div>
             </div>
 
-            <!-- Payments Tab -->
             <div id="payments" class="tab-content">
               <div class="bg-gray-50 p-6 rounded-lg shadow-inner">
                 <h3 class="text-xl font-bold text-gray-800 mb-4">
@@ -300,7 +302,8 @@
                     <div>
                       <label class="font-semibold text-gray-700"
                         >Pilih Siswa</label
-                      ><select
+                      >
+                      <select
                         id="paymentStudent"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                         required
@@ -311,7 +314,8 @@
                     <div>
                       <label class="font-semibold text-gray-700"
                         >Jumlah Pembayaran</label
-                      ><input
+                      >
+                      <input
                         type="number"
                         id="paymentAmount"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
@@ -322,7 +326,8 @@
                     <div>
                       <label class="font-semibold text-gray-700"
                         >Tanggal Mulai</label
-                      ><input
+                      >
+                      <input
                         type="date"
                         id="paymentDate"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
@@ -334,7 +339,8 @@
                     <div>
                       <label class="font-semibold text-gray-700"
                         >Hari Belajar 1</label
-                      ><select
+                      >
+                      <select
                         id="studyDay1"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                       >
@@ -350,7 +356,8 @@
                     <div>
                       <label class="font-semibold text-gray-700"
                         >Hari Belajar 2</label
-                      ><select
+                      >
+                      <select
                         id="studyDay2"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                       >
@@ -366,7 +373,8 @@
                     <div>
                       <label class="font-semibold text-gray-700"
                         >Jumlah Pertemuan</label
-                      ><input
+                      >
+                      <input
                         type="number"
                         id="totalMeetings"
                         value="10"
@@ -385,7 +393,108 @@
               </div>
             </div>
 
-            <!-- Classes Tab -->
+            <div id="expenses" class="tab-content">
+              <div class="bg-gray-50 p-6 rounded-lg shadow-inner">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">
+                  💸 Tambah Pengeluaran Baru
+                </h3>
+                <form id="addExpenseForm" class="space-y-4">
+                  <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div>
+                      <label class="font-semibold text-gray-700"
+                        >Tanggal Pengeluaran</label
+                      >
+                      <input
+                        type="date"
+                        id="expenseDate"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label class="font-semibold text-gray-700"
+                        >Kategori</label
+                      >
+                      <select
+                        id="expenseCategory"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        required
+                      >
+                        <option value="">Pilih Kategori...</option>
+                        <option>Listrik</option>
+                        <option>Sewa</option>
+                        <option>WiFi</option>
+                        <option>Kontrakan</option>
+                        <option>Gaji</option>
+                        <option>Peralatan</option>
+                        <option>Meta Verified</option>
+                        <option>Biaya Pemuda</option>
+                        <option>Sampah</option>
+                        <option>Sumbangan</option>
+                        <option>Lain-lain</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label class="font-semibold text-gray-700"
+                        >Jumlah (Rp)</label
+                      >
+                      <input
+                        type="number"
+                        id="expenseAmount"
+                        placeholder="Contoh: 50000"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label class="font-semibold text-gray-700"
+                        >Deskripsi</label
+                      >
+                      <input
+                        type="text"
+                        id="expenseDescription"
+                        placeholder="Contoh: Beli spidol"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <button
+                    type="submit"
+                    class="w-full md:w-auto bg-red-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700 transition duration-300"
+                  >
+                    Tambah Pengeluaran
+                  </button>
+                </form>
+              </div>
+              <div class="mt-8">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">
+                  📜 Riwayat Pengeluaran
+                </h3>
+                <div class="overflow-x-auto">
+                  <table class="min-w-full bg-white rounded-lg shadow">
+                    <thead class="bg-gray-100">
+                      <tr>
+                        <th class="p-4 text-left font-semibold text-gray-600">
+                          Tanggal
+                        </th>
+                        <th class="p-4 text-left font-semibold text-gray-600">
+                          Kategori
+                        </th>
+                        <th class="p-4 text-left font-semibold text-gray-600">
+                          Deskripsi
+                        </th>
+                        <th class="p-4 text-left font-semibold text-gray-600">
+                          Jumlah
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody id="expensesTable"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
             <div id="classes" class="tab-content">
               <h3 class="text-xl font-bold text-gray-800 mb-4">
                 📅 Jadwal Kelas Hari Ini (<span id="todayDate"></span>)
@@ -418,14 +527,16 @@
     </div>
 
     <script>
+      // --- KONFIGURASI ---
       const SPREADSHEET_WEB_APP_URL =
         "https://script.google.com/a/macros/mentora.id/s/AKfycbxtZ8xicc0BA4fPFdsJtKGVndHK7pMahCfg9XaCO-quWMn44Q2k0CjraG_1gTzsN1OYhQ/exec";
-
       const CORRECT_HASH =
         "4681feffeea7927aff71a38c7a9e20c38a0401c6e7ebd4f0e59e90ab8f97cc13";
 
+      // --- State Aplikasi ---
       let students = [];
       let payments = [];
+      let expenses = []; // BARU: State untuk pengeluaran
       let nextStudentId = 1;
       const dayNames = [
         "Minggu",
@@ -439,32 +550,31 @@
 
       // --- Event Listeners ---
       document.addEventListener("DOMContentLoaded", () => {
-        // Setup listener untuk form kode akses
         document
           .getElementById("access-form")
           .addEventListener("submit", handleAccessCodeSubmit);
       });
 
       function initializeApp() {
-        // Fungsi ini dipanggil SETELAH kode akses benar
         setupEventListeners();
         loadInitialData();
         document.getElementById("paymentDate").valueAsDate = new Date();
+        document.getElementById("expenseDate").valueAsDate = new Date(); // BARU
       }
 
       function setupEventListeners() {
-        // Navigasi Tab
         document.querySelectorAll(".nav-tab").forEach((tab) => {
           tab.addEventListener("click", () => switchTab(tab.dataset.tab));
         });
-
-        // Form Submissions
         document
           .getElementById("addStudentForm")
           .addEventListener("submit", handleAddStudent);
         document
           .getElementById("addPaymentForm")
           .addEventListener("submit", handleAddPayment);
+        document
+          .getElementById("addExpenseForm")
+          .addEventListener("submit", handleAddExpense); // BARU
       }
 
       // --- Fungsi Otentikasi ---
@@ -482,12 +592,10 @@
         const hashedInput = await sha256(inputCode);
 
         if (hashedInput === CORRECT_HASH) {
-          // Kode benar, sembunyikan modal dan tampilkan aplikasi
           document.getElementById("access-modal").style.display = "none";
           document.getElementById("main-app").style.display = "block";
-          initializeApp(); // Mulai aplikasi utama
+          initializeApp();
         } else {
-          // Kode salah
           errorP.textContent = "Kode akses salah. Coba lagi.";
           document.getElementById("access-code").value = "";
         }
@@ -496,14 +604,6 @@
       // --- Fungsi Utama ---
       async function loadInitialData() {
         document.getElementById("loading-overlay").style.display = "flex";
-        if (SPREADSHEET_WEB_APP_URL.includes("PASTE_YOUR_WEB_APP_URL_HERE")) {
-          alert(
-            "PENTING: Harap masukkan URL Web App Google Script Anda di dalam kode JavaScript (variabel SPREADSHEET_WEB_APP_URL) untuk menghubungkan ke spreadsheet."
-          );
-          document.getElementById("loading-overlay").style.display = "none";
-          return;
-        }
-
         try {
           const response = await fetch(
             `${SPREADSHEET_WEB_APP_URL}?action=getAllData`
@@ -514,6 +614,7 @@
 
           students = data.students || [];
           payments = data.payments || [];
+          expenses = data.expenses || []; // BARU: Muat data pengeluaran
 
           if (students.length > 0) {
             const maxId = Math.max(...students.map((s) => s.id || 0));
@@ -522,7 +623,11 @@
             nextStudentId = 1;
           }
 
-          console.log("Data berhasil dimuat:", { students, payments });
+          console.log("Data berhasil dimuat:", {
+            students,
+            payments,
+            expenses,
+          });
           renderAll();
         } catch (error) {
           console.error("Gagal memuat data dari Spreadsheet:", error);
@@ -587,10 +692,8 @@
         };
 
         const success = await saveDataToSheet("addPayment", newPayment);
-
         if (success) {
           payments.push(newPayment);
-
           const student = students.find((s) => s.id === studentId);
           if (student) {
             student.activeBatch = {
@@ -600,13 +703,44 @@
               totalMeetings: newPayment.totalMeetings,
             };
           }
-
           renderAll();
           e.target.reset();
           document.getElementById("paymentDate").valueAsDate = new Date();
           alert("Pembayaran dan jadwal berhasil dicatat!");
         } else {
           alert("Gagal menyimpan data pembayaran ke Spreadsheet.");
+        }
+      }
+
+      // BARU: Fungsi untuk menangani penambahan pengeluaran
+      async function handleAddExpense(e) {
+        e.preventDefault();
+        const newExpense = {
+          date: document.getElementById("expenseDate").value,
+          category: document.getElementById("expenseCategory").value,
+          description: document.getElementById("expenseDescription").value,
+          amount: parseInt(document.getElementById("expenseAmount").value),
+          createdAt: new Date().toISOString(),
+        };
+
+        if (
+          !newExpense.category ||
+          !newExpense.amount ||
+          !newExpense.description
+        ) {
+          alert("Harap isi semua field pengeluaran.");
+          return;
+        }
+
+        const success = await saveDataToSheet("addExpense", newExpense);
+        if (success) {
+          expenses.push(newExpense);
+          renderExpensesTable();
+          e.target.reset();
+          document.getElementById("expenseDate").valueAsDate = new Date();
+          alert("Pengeluaran berhasil dicatat!");
+        } else {
+          alert("Gagal menyimpan data pengeluaran ke Spreadsheet.");
         }
       }
 
@@ -644,6 +778,15 @@
         renderStudentsTable();
         renderClassesTable();
         updatePaymentStudentOptions();
+        renderExpensesTable(); // BARU
+      }
+
+      function formatCurrency(amount) {
+        return new Intl.NumberFormat("id-ID", {
+          style: "currency",
+          currency: "IDR",
+          minimumFractionDigits: 0,
+        }).format(amount);
       }
 
       function updateDashboard() {
@@ -712,6 +855,41 @@
         });
       }
 
+      // BARU: Fungsi untuk render tabel pengeluaran
+      function renderExpensesTable() {
+        const tbody = document.getElementById("expensesTable");
+        tbody.innerHTML = "";
+        if (expenses.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="4" class="text-center p-4 text-gray-500">Belum ada data pengeluaran.</td></tr>`;
+          return;
+        }
+
+        const sortedExpenses = [...expenses].sort(
+          (a, b) => new Date(b.date) - new Date(a.date)
+        );
+
+        sortedExpenses.forEach((exp) => {
+          const expenseDate = new Date(exp.date).toLocaleDateString("id-ID", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+          });
+          const row = `
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="p-4">${expenseDate}</td>
+                    <td class="p-4 font-semibold text-gray-800">${
+                      exp.category
+                    }</td>
+                    <td class="p-4">${exp.description}</td>
+                    <td class="p-4 font-semibold text-red-600">${formatCurrency(
+                      exp.amount
+                    )}</td>
+                </tr>
+            `;
+          tbody.innerHTML += row;
+        });
+      }
+
       function renderClassesTable() {
         const today = new Date();
         document.getElementById("todayDate").textContent =
@@ -721,7 +899,6 @@
             month: "long",
             day: "numeric",
           });
-
         const tbody = document.getElementById("todayClassesTable");
         tbody.innerHTML = "";
         const todayClasses = getTodayClasses();
@@ -816,7 +993,6 @@
         }
       }
 
-      // Fungsi utilitas untuk hashing SHA-256
       async function sha256(message) {
         const msgBuffer = new TextEncoder().encode(message);
         const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
