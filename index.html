@@ -1,49 +1,79 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Aplikasi Manajemen Mentora</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome untuk Icon -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <!-- Google Fonts -->
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
+    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- DataTables -->
     <link
       href="https://cdn.datatables.net/2.0.8/css/dataTables.tailwindcss.min.css"
       rel="stylesheet"
     />
     <script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/2.0.8/js/dataTables.tailwindcss.min.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
       body {
         font-family: "Inter", sans-serif;
+        background-color: #f3f4f6; /* bg-gray-100 */
       }
       .tab-content {
         display: none;
+        animation: fadeIn 0.3s ease-in-out;
       }
       .tab-content.active {
         display: block;
       }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(5px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Custom Scrollbar */
       ::-webkit-scrollbar {
         width: 8px;
+        height: 8px;
       }
       ::-webkit-scrollbar-track {
         background: #f1f5f9;
+        border-radius: 4px;
       }
       ::-webkit-scrollbar-thumb {
-        background: #6366f1;
+        background: #818cf8;
         border-radius: 4px;
       }
       ::-webkit-scrollbar-thumb:hover {
         background: #4f46e5;
       }
+
       #main-app {
         display: none;
       }
-      /* PENAMBAHAN: Style untuk loading spinner di tombol */
+
+      /* Loading Spinner Tombol */
       .btn-loading .spinner {
         display: inline-block;
         width: 1rem;
@@ -63,274 +93,419 @@
         margin-left: 0.5rem;
       }
 
-      /* datatable */
-      /* Latar belakang dan warna teks untuk Header Tabel */
+      /* Custom DataTables Styling */
       table.dataTable > thead {
-        background-color: #4f46e5 !important; /* bg-indigo-700 */
+        background: linear-gradient(to right, #4f46e5, #7c3aed) !important;
         color: white !important;
       }
       table.dataTable > thead th {
         color: white !important;
+        border-bottom: none;
       }
-
-      /* --- INPUT SEARCH & SHOW ENTRIES --- */
-      /* Mengubah warna border dan focus pada input */
       div.dt-search input,
       div.dt-length select {
-        border-color: #a5b4fc !important; /* border-indigo-300 */
-        background-color: white !important;
-        color: #374151 !important; /* text-gray-700 */
+        border: 1px solid #d1d5db !important;
+        border-radius: 0.5rem;
+        padding: 0.375rem 0.75rem;
         transition: all 0.2s ease-in-out;
       }
       div.dt-search input:focus,
       div.dt-length select:focus {
-        border-color: #6366f1 !important; /* border-indigo-500 */
+        border-color: #6366f1 !important;
         box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3) !important;
         outline: none !important;
       }
-
-      /* --- TOMBOL PAGINASI --- */
-      /* Warna tombol Paginasi standar */
       .dt-paging .dt-paging-button {
-        background: #e0e7ff !important; /* bg-indigo-100 */
-        color: #4338ca !important; /* text-indigo-800 */
-        border: 1px solid transparent !important;
-        border-radius: 0.375rem !important; /* rounded-md */
-        margin: 0 3px !important;
-        box-shadow: none !important;
+        background: #e0e7ff !important;
+        color: #4338ca !important;
+        border-radius: 0.375rem !important;
+        margin: 0 2px !important;
+        padding: 0.25rem 0.75rem !important;
+        border: none !important;
+        transition: all 0.2s ease;
       }
-
-      /* Warna tombol Paginasi saat di-hover */
       .dt-paging .dt-paging-button:hover {
-        background: #c7d2fe !important; /* bg-indigo-200 */
-        color: #3730a3 !important; /* text-indigo-900 */
-        border: 1px solid transparent !important;
+        background: #c7d2fe !important;
+        color: #3730a3 !important;
       }
-
-      /* Warna tombol Paginasi untuk halaman yang sedang aktif */
-      .dt-paging .dt-paging-button.current,
-      .dt-paging .dt-paging-button.current:hover {
-        background: #4f46e5 !important; /* bg-indigo-700 */
+      .dt-paging .dt-paging-button.current {
+        background: #4f46e5 !important;
         color: white !important;
-        border: 1px solid #4338ca !important;
+        font-weight: bold;
       }
-
-      /* Warna tombol disabled (mis: Previous saat di halaman 1) */
-      .dt-paging .dt-paging-button.disabled,
-      .dt-paging .dt-paging-button.disabled:hover {
-        background: #f3f4f6 !important; /* bg-gray-100 */
-        color: #9ca3af !important; /* text-gray-400 */
-        border: 1px solid #e5e7eb !important;
+      .dt-paging .dt-paging-button.disabled {
+        background: #f3f4f6 !important;
+        color: #9ca3af !important;
       }
-
-      /* --- HOVER & BORDER BARIS --- */
-      /* Warna latar belakang baris saat di-hover */
       table.dataTable tbody tr:hover {
-        background-color: #eef2ff !important; /* bg-indigo-50 */
+        background-color: #eef2ff !important;
+      }
+      table.dataTable > tbody > tr > td {
+        border-bottom: 1px solid #e5e7eb;
+        vertical-align: middle;
       }
 
-      /* Border antar baris */
-      table.dataTable > tbody > tr > td {
-        border-bottom: 1px solid #e5e7eb; /* border-gray-200 */
+      /* SweetAlert2 Custom Styling for Tailwind */
+      div:where(.swal2-container) button:where(.swal2-styled) {
+        margin: 0.3125em;
+        border-radius: 0.5rem;
+        font-weight: 600;
       }
     </style>
   </head>
-  <body class="bg-gray-100">
+  <body>
+    <!-- Modal Login -->
     <div
       id="access-modal"
       class="fixed inset-0 bg-gray-900 bg-opacity-90 z-50 flex items-center justify-center p-4"
     >
-      <div class="w-full max-w-sm bg-white rounded-2xl shadow-2xl p-8">
-        <h2 class="text-2xl font-bold text-center text-gray-800 mb-2">
-          Verifikasi Akses
-        </h2>
-        <p class="text-center text-gray-500 mb-6">
-          Masukkan kode akses untuk melanjutkan.
-        </p>
+      <div
+        class="w-full max-w-sm bg-white rounded-2xl shadow-2xl p-8 transform transition-all"
+      >
+        <div class="text-center mb-6">
+          <div
+            class="inline-block p-4 rounded-full bg-indigo-100 text-indigo-600 mb-3"
+          >
+            <i class="fas fa-lock text-3xl"></i>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-800">Verifikasi Akses</h2>
+          <p class="text-gray-500 text-sm mt-1">Sistem Manajemen Mentora</p>
+        </div>
         <form id="access-form">
           <input
             type="password"
             id="access-code"
-            class="w-full px-4 py-3 rounded-lg border-gray-300 text-center text-lg tracking-widest focus:ring-indigo-500 focus:border-indigo-500"
+            class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 text-center text-xl tracking-widest focus:ring-0 focus:border-indigo-500 transition-colors"
             placeholder="••••••••"
             required
           />
           <p
             id="access-error"
-            class="text-red-500 text-sm text-center mt-2 h-5"
+            class="text-red-500 text-sm text-center mt-2 h-5 font-medium"
           ></p>
           <button
             type="submit"
-            class="w-full bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-indigo-700 transition duration-300 mt-4"
+            class="w-full bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-indigo-700 hover:shadow-lg transition duration-300 mt-4 flex justify-center items-center gap-2"
           >
-            Masuk
+            <i class="fas fa-sign-in-alt"></i> Masuk
           </button>
         </form>
       </div>
     </div>
 
+    <!-- Loading Overlay Global -->
     <div
       id="loading-overlay"
-      class="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center"
+      class="fixed inset-0 bg-gray-900 bg-opacity-75 z-40 flex flex-col items-center justify-center backdrop-blur-sm"
       style="display: none"
     >
       <div
-        class="w-16 h-16 border-4 border-white border-t-transparent border-solid rounded-full animate-spin"
+        class="w-16 h-16 border-4 border-indigo-400 border-t-indigo-600 border-solid rounded-full animate-spin"
       ></div>
-      <p class="ml-4 text-white text-xl">Memuat data...</p>
+      <p class="mt-4 text-white font-semibold text-lg animate-pulse">
+        Menyinkronkan Data...
+      </p>
     </div>
 
     <div id="main-app">
-      <div class="container mx-auto p-4 md:p-8 max-w-7xl">
-        <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+      <div class="container mx-auto p-4 md:p-6 max-w-[1400px]">
+        <div
+          class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100"
+        >
+          <!-- Header Utama -->
           <header
-            class="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-white text-center"
+            class="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800 p-6 sm:p-8 text-white relative overflow-hidden"
           >
-            <h1 class="text-3xl md:text-4xl font-bold">📚 Mentora Finance</h1>
-            <p class="mt-2 text-indigo-200">
-              Sistem Manajemen Siswa & Jadwal Terintegrasi Spreadsheet
-            </p>
+            <div
+              class="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl"
+            ></div>
+            <div
+              class="absolute bottom-0 left-0 -mb-4 -ml-4 w-24 h-24 bg-white opacity-10 rounded-full blur-xl"
+            ></div>
+
+            <div
+              class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-4"
+            >
+              <div class="text-center md:text-left">
+                <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">
+                  <i class="fas fa-graduation-cap mr-2"></i> Mentora Finance
+                </h1>
+                <p class="mt-2 text-indigo-100 font-medium opacity-90">
+                  Sistem Manajemen Siswa & Jadwal Terintegrasi
+                </p>
+              </div>
+              <!-- FITUR 1: Tombol Logout -->
+              <button
+                onclick="handleLogout()"
+                class="bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/30 text-white px-4 py-2 rounded-lg font-semibold transition-all flex items-center gap-2 shadow-sm"
+              >
+                <i class="fas fa-power-off"></i> Logout
+              </button>
+            </div>
           </header>
 
-          <nav class="flex flex-wrap border-b border-gray-200 bg-gray-50">
+          <!-- Navigasi Tab -->
+          <nav
+            class="flex flex-wrap border-b border-gray-200 bg-gray-50/80 backdrop-blur-sm sticky top-0 z-20"
+          >
             <button
               data-tab="dashboard"
-              class="nav-tab flex-1 py-4 px-2 text-center font-semibold text-gray-600 border-b-4 border-transparent hover:bg-gray-200 hover:text-indigo-600 transition duration-300 active"
+              class="nav-tab flex-1 py-4 px-3 text-center font-semibold text-gray-500 border-b-4 border-transparent hover:bg-gray-100 hover:text-indigo-600 transition duration-300 active whitespace-nowrap"
             >
-              📊 Dashboard
+              <i class="fas fa-chart-pie mr-1"></i> Dashboard
             </button>
             <button
               data-tab="students"
-              class="nav-tab flex-1 py-4 px-2 text-center font-semibold text-gray-600 border-b-4 border-transparent hover:bg-gray-200 hover:text-indigo-600 transition duration-300"
+              class="nav-tab flex-1 py-4 px-3 text-center font-semibold text-gray-500 border-b-4 border-transparent hover:bg-gray-100 hover:text-indigo-600 transition duration-300 whitespace-nowrap"
             >
-              👥 Data Siswa
+              <i class="fas fa-users mr-1"></i> Data Siswa
             </button>
             <button
               data-tab="class-groups"
-              class="nav-tab flex-1 py-4 px-2 text-center font-semibold text-gray-600 border-b-4 border-transparent hover:bg-gray-200 hover:text-indigo-600 transition duration-300"
+              class="nav-tab flex-1 py-4 px-3 text-center font-semibold text-gray-500 border-b-4 border-transparent hover:bg-gray-100 hover:text-indigo-600 transition duration-300 whitespace-nowrap"
             >
-              👨‍🏫 Kelompok Kelas
+              <i class="fas fa-chalkboard-teacher mr-1"></i> Kelompok Kelas
             </button>
             <button
               data-tab="payments"
-              class="nav-tab flex-1 py-4 px-2 text-center font-semibold text-gray-600 border-b-4 border-transparent hover:bg-gray-200 hover:text-indigo-600 transition duration-300"
+              class="nav-tab flex-1 py-4 px-3 text-center font-semibold text-gray-500 border-b-4 border-transparent hover:bg-gray-100 hover:text-indigo-600 transition duration-300 whitespace-nowrap"
             >
-              💰 Pembayaran
+              <i class="fas fa-wallet mr-1"></i> Pembayaran
             </button>
             <button
               data-tab="expenses"
-              class="nav-tab flex-1 py-4 px-2 text-center font-semibold text-gray-600 border-b-4 border-transparent hover:bg-gray-200 hover:text-indigo-600 transition duration-300"
+              class="nav-tab flex-1 py-4 px-3 text-center font-semibold text-gray-500 border-b-4 border-transparent hover:bg-gray-100 hover:text-indigo-600 transition duration-300 whitespace-nowrap"
             >
-              💸 Pengeluaran
+              <i class="fas fa-file-invoice-dollar mr-1"></i> Pengeluaran
             </button>
             <button
               data-tab="classes"
-              class="nav-tab flex-1 py-4 px-2 text-center font-semibold text-gray-600 border-b-4 border-transparent hover:bg-gray-200 hover:text-indigo-600 transition duration-300"
+              class="nav-tab flex-1 py-4 px-3 text-center font-semibold text-gray-500 border-b-4 border-transparent hover:bg-gray-100 hover:text-indigo-600 transition duration-300 whitespace-nowrap"
             >
-              📅 Jadwal Kelas
+              <i class="fas fa-calendar-alt mr-1"></i> Jadwal Kelas
             </button>
           </nav>
 
-          <main class="p-6 md:p-8">
+          <main class="p-6 md:p-8 min-h-[500px]">
+            <!-- TAB: DASHBOARD -->
             <div id="dashboard" class="tab-content active">
+              <h3
+                class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2"
+              >
+                <i class="fas fa-chart-line text-indigo-600"></i> Statistik Umum
+              </h3>
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="card bg-blue-50 p-5 rounded-xl">
-                  <h3 class="font-bold text-blue-800">👥 Siswa Aktif</h3>
+                <div
+                  class="card bg-white border border-blue-100 shadow-sm p-6 rounded-2xl hover:shadow-md transition-shadow relative overflow-hidden group"
+                >
                   <div
-                    class="text-3xl font-bold text-blue-600 mt-2"
-                    id="activeStudents"
+                    class="absolute right-0 top-0 w-16 h-16 bg-blue-50 rounded-bl-full -z-10 group-hover:scale-110 transition-transform"
+                  ></div>
+                  <h3
+                    class="font-bold text-blue-800 text-sm uppercase tracking-wider"
                   >
-                    0
+                    Siswa Aktif
+                  </h3>
+                  <div
+                    class="text-4xl font-extrabold text-blue-600 mt-2 flex items-center justify-between"
+                  >
+                    <span id="activeStudents">0</span>
+                    <i class="fas fa-user-graduate text-blue-200"></i>
                   </div>
                 </div>
-                <div class="card bg-green-50 p-5 rounded-xl">
-                  <h3 class="font-bold text-green-800">📚 Kelas Reguler</h3>
+                <div
+                  class="card bg-white border border-green-100 shadow-sm p-6 rounded-2xl hover:shadow-md transition-shadow relative overflow-hidden group"
+                >
                   <div
-                    class="text-3xl font-bold text-green-600 mt-2"
-                    id="regularStudents"
+                    class="absolute right-0 top-0 w-16 h-16 bg-green-50 rounded-bl-full -z-10 group-hover:scale-110 transition-transform"
+                  ></div>
+                  <h3
+                    class="font-bold text-green-800 text-sm uppercase tracking-wider"
                   >
-                    0
+                    Kelas Reguler
+                  </h3>
+                  <div
+                    class="text-4xl font-extrabold text-green-600 mt-2 flex items-center justify-between"
+                  >
+                    <span id="regularStudents">0</span>
+                    <i class="fas fa-book text-green-200"></i>
                   </div>
                 </div>
-                <div class="card bg-purple-50 p-5 rounded-xl">
-                  <h3 class="font-bold text-purple-800">⚡ Kelas Intensif</h3>
+                <div
+                  class="card bg-white border border-purple-100 shadow-sm p-6 rounded-2xl hover:shadow-md transition-shadow relative overflow-hidden group"
+                >
                   <div
-                    class="text-3xl font-bold text-purple-600 mt-2"
-                    id="intensiveStudents"
+                    class="absolute right-0 top-0 w-16 h-16 bg-purple-50 rounded-bl-full -z-10 group-hover:scale-110 transition-transform"
+                  ></div>
+                  <h3
+                    class="font-bold text-purple-800 text-sm uppercase tracking-wider"
                   >
-                    0
+                    Kelas Intensif
+                  </h3>
+                  <div
+                    class="text-4xl font-extrabold text-purple-600 mt-2 flex items-center justify-between"
+                  >
+                    <span id="intensiveStudents">0</span>
+                    <i class="fas fa-bolt text-purple-200"></i>
                   </div>
                 </div>
-                <div class="card bg-yellow-50 p-5 rounded-xl">
-                  <h3 class="font-bold text-yellow-800">⏰ Kelas Hari Ini</h3>
+                <div
+                  class="card bg-white border border-yellow-100 shadow-sm p-6 rounded-2xl hover:shadow-md transition-shadow relative overflow-hidden group"
+                >
                   <div
-                    class="text-3xl font-bold text-yellow-600 mt-2"
-                    id="todayClasses"
+                    class="absolute right-0 top-0 w-16 h-16 bg-yellow-50 rounded-bl-full -z-10 group-hover:scale-110 transition-transform"
+                  ></div>
+                  <h3
+                    class="font-bold text-yellow-800 text-sm uppercase tracking-wider"
+                  >
+                    Kelas Hari Ini
+                  </h3>
+                  <div
+                    class="text-4xl font-extrabold text-yellow-600 mt-2 flex items-center justify-between"
+                  >
+                    <span id="todayClassesCount">0</span>
+                    <i class="fas fa-clock text-yellow-200"></i>
+                  </div>
+                </div>
+              </div>
+
+              <!-- FITUR 9: Dashboard Operasional Hari Ini -->
+              <h3
+                class="text-xl font-bold text-gray-800 mb-4 mt-10 flex items-center gap-2 border-t pt-8"
+              >
+                <i class="fas fa-tasks text-indigo-600"></i> Operasional Hari
+                Ini
+              </h3>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div
+                  class="bg-gradient-to-br from-indigo-50 to-white p-5 rounded-xl border border-indigo-100 shadow-sm"
+                >
+                  <div class="flex items-center gap-3 mb-2">
+                    <div class="p-2 bg-indigo-100 text-indigo-600 rounded-lg">
+                      <i class="fab fa-whatsapp"></i>
+                    </div>
+                    <h4 class="font-semibold text-gray-700">Status Reminder</h4>
+                  </div>
+                  <p
+                    class="text-3xl font-bold text-gray-800"
+                    id="opBelumReminder"
                   >
                     0
+                  </p>
+                  <p class="text-sm text-gray-500 mt-1">
+                    Siswa belum direminder kelas hari ini
+                  </p>
+                </div>
+                <div
+                  class="bg-gradient-to-br from-red-50 to-white p-5 rounded-xl border border-red-100 shadow-sm"
+                >
+                  <div class="flex items-center gap-3 mb-2">
+                    <div class="p-2 bg-red-100 text-red-600 rounded-lg">
+                      <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h4 class="font-semibold text-gray-700">
+                      Siswa Perlu Follow Up
+                    </h4>
                   </div>
+                  <p class="text-3xl font-bold text-red-600" id="opHampirHabis">
+                    0
+                  </p>
+                  <p class="text-sm text-gray-500 mt-1">
+                    Siswa dengan sisa pertemuan ≤ 2
+                  </p>
+                </div>
+                <div
+                  class="bg-gradient-to-br from-teal-50 to-white p-5 rounded-xl border border-teal-100 shadow-sm"
+                >
+                  <div class="flex items-center gap-3 mb-2">
+                    <div class="p-2 bg-teal-100 text-teal-600 rounded-lg">
+                      <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <h4 class="font-semibold text-gray-700">
+                      Pengajar Mengajar
+                    </h4>
+                  </div>
+                  <p
+                    class="text-3xl font-bold text-teal-600"
+                    id="opPengajarAktif"
+                  >
+                    0
+                  </p>
+                  <p class="text-sm text-gray-500 mt-1">
+                    Pengajar aktif berjadwal hari ini
+                  </p>
                 </div>
               </div>
             </div>
 
+            <!-- TAB: STUDENTS -->
             <div id="students" class="tab-content">
-              <div class="bg-gray-50 p-6 rounded-lg shadow-inner">
-                <h3 class="text-xl font-bold text-gray-800 mb-4">
-                  ➕ Tambah Siswa Baru
-                </h3>
+              <!-- Form Tambah Siswa -->
+              <div
+                class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm mb-8"
+              >
+                <div class="flex items-center gap-2 mb-4 text-gray-800">
+                  <i class="fas fa-user-plus text-indigo-600 text-xl"></i>
+                  <h3 class="text-xl font-bold">Tambah Siswa Baru</h3>
+                </div>
                 <form id="addStudentForm" class="space-y-4">
-                  <div class="grid md:grid-cols-3 gap-4">
+                  <div class="grid md:grid-cols-3 gap-5">
                     <div>
-                      <label class="font-semibold text-gray-700"
-                        >Nama Siswa</label
+                      <label class="font-semibold text-gray-700 text-sm"
+                        >Nama Lengkap</label
                       >
                       <input
                         type="text"
                         id="studentName"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-50 border p-2.5 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all outline-none"
                         required
+                        placeholder="Contoh: Budi Santoso"
                       />
                     </div>
                     <div>
-                      <label class="font-semibold text-gray-700"
-                        >No. Telepon</label
+                      <label class="font-semibold text-gray-700 text-sm"
+                        >No. WhatsApp</label
                       >
                       <input
                         type="tel"
                         id="studentPhone"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-50 border p-2.5 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all outline-none"
+                        placeholder="08123456789"
+                        required
                       />
                     </div>
                     <div>
-                      <label class="font-semibold text-gray-700">Email</label>
+                      <label class="font-semibold text-gray-700 text-sm"
+                        >Email (Opsional)</label
+                      >
                       <input
                         type="email"
                         id="studentEmail"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-50 border p-2.5 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all outline-none"
+                        placeholder="budi@email.com"
                       />
                     </div>
-                  </div>
-                  <div class="grid md:grid-cols-3 gap-4">
                     <div>
-                      <label class="font-semibold text-gray-700"
+                      <label class="font-semibold text-gray-700 text-sm"
                         >Asal Sekolah</label
                       >
                       <input
                         type="text"
                         id="studentSchool"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-50 border p-2.5 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all outline-none"
+                        placeholder="SDN 1 Mentora"
                       />
                     </div>
                     <div>
-                      <label class="font-semibold text-gray-700"
+                      <label class="font-semibold text-gray-700 text-sm"
                         >Tingkatan</label
                       >
                       <select
                         id="studentLevel"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-50 border p-2.5 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all outline-none"
                         required
                       >
-                        <option value="">Pilih...</option>
+                        <option value="">Pilih Tingkatan...</option>
                         <option>TK</option>
                         <option>SD</option>
                         <option>SMP</option>
@@ -338,12 +513,12 @@
                       </select>
                     </div>
                     <div>
-                      <label class="font-semibold text-gray-700"
+                      <label class="font-semibold text-gray-700 text-sm"
                         >Jenis Kelas</label
                       >
                       <select
                         id="studentClassType"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-50 border p-2.5 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all outline-none"
                         required
                       >
                         <option>Reguler</option>
@@ -351,49 +526,84 @@
                       </select>
                     </div>
                   </div>
-                  <button
-                    type="submit"
-                    class="w-full md:w-auto bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700 transition duration-300 flex items-center justify-center"
-                  >
-                    <span class="btn-text">Tambah Siswa</span>
-                  </button>
+                  <div class="pt-2">
+                    <button
+                      type="submit"
+                      class="w-full md:w-auto bg-indigo-600 text-white font-bold py-2.5 px-6 rounded-lg hover:bg-indigo-700 shadow-md hover:shadow-lg transition duration-300 flex items-center justify-center gap-2"
+                    >
+                      <i class="fas fa-save"></i>
+                      <span class="btn-text">Simpan Siswa</span>
+                    </button>
+                  </div>
                 </form>
               </div>
-              <div class="mt-8">
-                <h3 class="text-xl font-bold text-gray-800 mb-4">
-                  👥 Daftar Siswa
-                </h3>
-                <div class="overflow-x-auto">
+
+              <!-- Tabel Daftar Siswa -->
+              <div>
+                <div
+                  class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4"
+                >
+                  <h3
+                    class="text-xl font-bold text-gray-800 flex items-center gap-2"
+                  >
+                    <i class="fas fa-list text-indigo-600"></i> Database Siswa
+                  </h3>
+
+                  <!-- FITUR 11: Filter Custom DataTables -->
+                  <div class="flex flex-wrap gap-2 w-full md:w-auto">
+                    <select
+                      id="filterTeacher"
+                      class="text-sm border-gray-300 rounded-lg p-2 bg-white shadow-sm outline-none focus:ring-2 focus:ring-indigo-200"
+                    >
+                      <option value="">Semua Pengajar</option>
+                    </select>
+                    <select
+                      id="filterStatus"
+                      class="text-sm border-gray-300 rounded-lg p-2 bg-white shadow-sm outline-none focus:ring-2 focus:ring-indigo-200"
+                    >
+                      <option value="">Semua Status</option>
+                      <option value="Aktif">Aktif</option>
+                      <option value="Tidak Aktif">Tidak Aktif</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div
+                  class="overflow-x-auto bg-white rounded-xl shadow-sm border border-gray-100"
+                >
                   <table
                     id="studentsDataTable"
-                    class="display w-full bg-white"
+                    class="display w-full whitespace-nowrap"
                     style="width: 100%"
                   >
                     <thead>
                       <tr>
-                        <th class="p-4 text-left font-semibold text-gray-600">
-                          ID
+                        <th class="p-4 text-left font-semibold text-sm">ID</th>
+                        <th class="p-4 text-left font-semibold text-sm">
+                          Nama & Biodata
                         </th>
-                        <th class="p-4 text-left font-semibold text-gray-600">
-                          Nama
-                        </th>
-                        <th class="p-4 text-left font-semibold text-gray-600">
+                        <th class="p-4 text-left font-semibold text-sm">
                           Tingkatan
                         </th>
-                        <th class="p-4 text-left font-semibold text-gray-600">
-                          Jenis Kelas
+                        <th class="p-4 text-left font-semibold text-sm">
+                          Tipe Kelas
                         </th>
-                        <th class="p-4 text-left font-semibold text-gray-600">
+                        <th class="p-4 text-left font-semibold text-sm">
                           Status
                         </th>
-                        <th class="p-4 text-left font-semibold text-gray-600">
+                        <th class="p-4 text-left font-semibold text-sm">
                           Jadwal
                         </th>
-                        <th class="p-4 text-left font-semibold text-gray-600">
+                        <th class="p-4 text-left font-semibold text-sm">
                           Pengajar
                         </th>
-                        <th class="p-4 text-left font-semibold text-gray-600">
-                          Sisa Pertemuan
+                        <!-- Fitur 6 -->
+                        <th class="p-4 text-left font-semibold text-sm w-32">
+                          Progress
+                        </th>
+                        <!-- Fitur 7 -->
+                        <th class="p-4 text-center font-semibold text-sm">
+                          Aksi Cepat
                         </th>
                       </tr>
                     </thead>
@@ -403,9 +613,13 @@
               </div>
             </div>
 
+            <!-- TAB: KELOMPOK KELAS -->
             <div id="class-groups" class="tab-content">
-              <h3 class="text-xl font-bold text-gray-800 mb-4">
-                👨‍🏫 Kelompok Kelas Berdasarkan Pengajar
+              <h3
+                class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2"
+              >
+                <i class="fas fa-users-cog text-indigo-600"></i> Distribusi
+                Kelompok Pengajar
               </h3>
               <div
                 id="classGroupsContainer"
@@ -413,69 +627,78 @@
               ></div>
             </div>
 
+            <!-- TAB: PAYMENTS -->
             <div id="payments" class="tab-content">
-              <div class="bg-gray-50 p-6 rounded-lg shadow-inner">
-                <h3 class="text-xl font-bold text-gray-800 mb-4">
-                  💰 Catat Pembayaran & Jadwal
-                </h3>
-                <form id="addPaymentForm" class="space-y-4">
-                  <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div
+                class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm"
+              >
+                <div class="flex items-center gap-2 mb-6 text-gray-800">
+                  <i class="fas fa-money-check-alt text-green-600 text-xl"></i>
+                  <h3 class="text-xl font-bold">
+                    Catat Pembayaran & Setup Jadwal Baru
+                  </h3>
+                </div>
+                <form id="addPaymentForm" class="space-y-5">
+                  <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
                     <div>
-                      <label class="font-semibold text-gray-700"
+                      <label class="font-semibold text-gray-700 text-sm"
                         >Pilih Siswa</label
                       >
                       <select
                         id="paymentStudent"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-50 border p-2.5 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all outline-none"
                         required
                       >
                         <option value="">Pilih Siswa...</option>
                       </select>
                     </div>
                     <div>
-                      <label class="font-semibold text-gray-700"
+                      <label class="font-semibold text-gray-700 text-sm"
                         >Pilih Pengajar</label
                       >
                       <select
                         id="paymentTeacher"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-50 border p-2.5 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all outline-none"
                         required
                       >
                         <option value="">Pilih Pengajar...</option>
                       </select>
                     </div>
                     <div>
-                      <label class="font-semibold text-gray-700"
-                        >Jumlah Pembayaran</label
+                      <label class="font-semibold text-gray-700 text-sm"
+                        >Jumlah (Rp)</label
                       >
                       <input
                         type="number"
                         id="paymentAmount"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-50 border p-2.5 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all outline-none"
                         required
                         min="0"
+                        placeholder="500000"
                       />
                     </div>
                     <div>
-                      <label class="font-semibold text-gray-700"
-                        >Tanggal Mulai</label
+                      <label class="font-semibold text-gray-700 text-sm"
+                        >Tanggal Berlaku</label
                       >
                       <input
                         type="date"
                         id="paymentDate"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-50 border p-2.5 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all outline-none"
                         required
                       />
                     </div>
                   </div>
-                  <div class="grid md:grid-cols-3 gap-4">
+                  <div
+                    class="grid md:grid-cols-3 gap-5 bg-green-50/50 p-4 rounded-xl border border-green-100"
+                  >
                     <div>
-                      <label class="font-semibold text-gray-700"
+                      <label class="font-semibold text-gray-700 text-sm"
                         >Hari Belajar 1</label
                       >
                       <select
                         id="studyDay1"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        class="mt-1 block w-full rounded-lg border-gray-300 bg-white border p-2.5 focus:border-green-500 focus:ring-2 focus:ring-green-200 outline-none"
                       >
                         <option value="1">Senin</option>
                         <option value="2">Selasa</option>
@@ -487,12 +710,12 @@
                       </select>
                     </div>
                     <div>
-                      <label class="font-semibold text-gray-700"
+                      <label class="font-semibold text-gray-700 text-sm"
                         >Hari Belajar 2</label
                       >
                       <select
                         id="studyDay2"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        class="mt-1 block w-full rounded-lg border-gray-300 bg-white border p-2.5 focus:border-green-500 focus:ring-2 focus:ring-green-200 outline-none"
                       >
                         <option value="1">Senin</option>
                         <option value="2" selected>Selasa</option>
@@ -504,53 +727,60 @@
                       </select>
                     </div>
                     <div>
-                      <label class="font-semibold text-gray-700"
-                        >Jumlah Pertemuan</label
+                      <label class="font-semibold text-gray-700 text-sm"
+                        >Total Jatah Pertemuan</label
                       >
                       <input
                         type="number"
                         id="totalMeetings"
                         value="10"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        class="mt-1 block w-full rounded-lg border-gray-300 bg-white border p-2.5 focus:border-green-500 focus:ring-2 focus:ring-green-200 outline-none"
                         required
                       />
                     </div>
                   </div>
                   <button
                     type="submit"
-                    class="w-full md:w-auto bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition duration-300 flex items-center justify-center"
+                    class="w-full md:w-auto bg-green-600 text-white font-bold py-2.5 px-6 rounded-lg hover:bg-green-700 shadow-md hover:shadow-lg transition duration-300 flex items-center justify-center gap-2"
                   >
-                    <span class="btn-text">Catat & Buat Jadwal</span>
+                    <i class="fas fa-check-circle"></i>
+                    <span class="btn-text">Catat & Aktivasi Jadwal</span>
                   </button>
                 </form>
               </div>
             </div>
 
+            <!-- TAB: EXPENSES -->
             <div id="expenses" class="tab-content">
-              <div class="bg-gray-50 p-6 rounded-lg shadow-inner">
-                <h3 class="text-xl font-bold text-gray-800 mb-4">
-                  💸 Tambah Pengeluaran Baru
-                </h3>
+              <div
+                class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm mb-8"
+              >
+                <div class="flex items-center gap-2 mb-4 text-gray-800">
+                  <i class="fas fa-receipt text-red-600 text-xl"></i>
+                  <h3 class="text-xl font-bold">
+                    Input Pengeluaran Operasional
+                  </h3>
+                </div>
                 <form id="addExpenseForm" class="space-y-4">
-                  <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
                     <div>
-                      <label class="font-semibold text-gray-700"
-                        >Tanggal Pengeluaran</label
+                      <label class="font-semibold text-gray-700 text-sm"
+                        >Tanggal</label
                       >
                       <input
                         type="date"
                         id="expenseDate"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-50 border p-2.5 focus:bg-white focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none"
                         required
                       />
                     </div>
                     <div>
-                      <label class="font-semibold text-gray-700"
+                      <label class="font-semibold text-gray-700 text-sm"
                         >Kategori</label
                       >
                       <select
                         id="expenseCategory"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-50 border p-2.5 focus:bg-white focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none"
                         required
                       >
                         <option value="">Pilih Kategori...</option>
@@ -568,61 +798,68 @@
                       </select>
                     </div>
                     <div>
-                      <label class="font-semibold text-gray-700"
+                      <label class="font-semibold text-gray-700 text-sm"
                         >Jumlah (Rp)</label
                       >
                       <input
                         type="number"
                         id="expenseAmount"
                         placeholder="Contoh: 50000"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-50 border p-2.5 focus:bg-white focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none"
                         required
                       />
                     </div>
                     <div>
-                      <label class="font-semibold text-gray-700"
+                      <label class="font-semibold text-gray-700 text-sm"
                         >Deskripsi</label
                       >
                       <input
                         type="text"
                         id="expenseDescription"
                         placeholder="Contoh: Beli spidol"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-50 border p-2.5 focus:bg-white focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none"
                         required
                       />
                     </div>
                   </div>
                   <button
                     type="submit"
-                    class="w-full md:w-auto bg-red-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700 transition duration-300 flex items-center justify-center"
+                    class="w-full md:w-auto bg-red-600 text-white font-bold py-2.5 px-6 rounded-lg hover:bg-red-700 shadow-md hover:shadow-lg transition duration-300 flex items-center justify-center gap-2"
                   >
-                    <span class="btn-text">Tambah Pengeluaran</span>
+                    <i class="fas fa-plus"></i>
+                    <span class="btn-text">Tambah Data</span>
                   </button>
                 </form>
               </div>
-              <div class="mt-8">
-                <h3 class="text-xl font-bold text-gray-800 mb-4">
-                  📜 Riwayat Pengeluaran
+
+              <div>
+                <h3
+                  class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2"
+                >
+                  <i class="fas fa-history text-indigo-600"></i> Riwayat
+                  Pengeluaran
                 </h3>
-                <div class="overflow-x-auto">
+                <div
+                  class="overflow-x-auto bg-white rounded-xl shadow-sm border border-gray-100"
+                >
                   <table
                     id="expensesDataTable"
-                    class="display w-full bg-white"
+                    class="display w-full"
                     style="width: 100%"
                   >
                     <thead>
                       <tr>
-                        <th class="p-4 text-left font-semibold text-gray-600">
+                        <th class="p-4 text-left font-semibold text-sm">
                           Tanggal
                         </th>
-                        <th class="p-4 text-left font-semibold text-gray-600">
+                        <th class="p-4 text-left font-semibold text-sm">
                           Kategori
                         </th>
-                        <th class="p-4 text-left font-semibold text-gray-600">
+                        <th class="p-4 text-left font-semibold text-sm">
                           Deskripsi
                         </th>
-                        <th class="p-4 text-left font-semibold text-gray-600">
-                          Jumlah
+                        <th class="p-4 text-left font-semibold text-sm">
+                          Nominal
                         </th>
                       </tr>
                     </thead>
@@ -632,32 +869,50 @@
               </div>
             </div>
 
+            <!-- TAB: CLASSES (Jadwal Hari Ini) -->
             <div id="classes" class="tab-content">
-              <h3 class="text-xl font-bold text-gray-800 mb-4">
-                📅 Jadwal Kelas Hari Ini (<span id="todayDate"></span>)
-              </h3>
-              <div class="overflow-x-auto">
+              <div
+                class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 border-b pb-4"
+              >
+                <h3
+                  class="text-xl font-bold text-gray-800 flex items-center gap-2"
+                >
+                  <i class="fas fa-calendar-check text-indigo-600"></i>
+                  Kelas Hari Ini
+                  <span
+                    class="text-indigo-600 font-extrabold ml-1"
+                    id="todayDate"
+                  ></span>
+                </h3>
+              </div>
+
+              <div
+                class="overflow-x-auto bg-white rounded-xl shadow-sm border border-gray-100"
+              >
                 <table
                   id="todayClassesDataTable"
-                  class="display w-full bg-white"
+                  class="display w-full whitespace-nowrap"
                   style="width: 100%"
                 >
                   <thead>
                     <tr>
-                      <th class="p-4 text-left font-semibold text-gray-600">
-                        Siswa
+                      <th class="p-4 text-left font-semibold text-sm">
+                        Nama Siswa
                       </th>
-                      <th class="p-4 text-left font-semibold text-gray-600">
-                        Jenis Kelas
+                      <th class="p-4 text-left font-semibold text-sm">
+                        Tipe Kelas
                       </th>
-                      <th class="p-4 text-left font-semibold text-gray-600">
+                      <th class="p-4 text-left font-semibold text-sm">
                         Pengajar
                       </th>
-                      <th class="p-4 text-left font-semibold text-gray-600">
-                        Pertemuan Ke
+                      <th class="p-4 text-left font-semibold text-sm w-32">
+                        Progress
                       </th>
-                      <th class="p-4 text-left font-semibold text-gray-600">
-                        Aksi
+                      <th class="p-4 text-center font-semibold text-sm">
+                        Status Reminder
+                      </th>
+                      <th class="p-4 text-center font-semibold text-sm">
+                        Absensi
                       </th>
                     </tr>
                   </thead>
@@ -671,17 +926,17 @@
     </div>
 
     <script>
-      // --- KONFIGURASI ---
+      // --- KONFIGURASI URL & HASH ---
       const SPREADSHEET_WEB_APP_URL =
         "https://script.google.com/a/macros/mentora.id/s/AKfycbxtZ8xicc0BA4fPFdsJtKGVndHK7pMahCfg9XaCO-quWMn44Q2k0CjraG_1gTzsN1OYhQ/exec";
       const CORRECT_HASH =
         "60c83b0efd98b24e9f5328cb5e7a4a831b06db634d1f2bfcbaa238b8044e3f02";
 
-      // --- State Aplikasi ---
+      // --- STATE APLIKASI ---
       let students = [];
       let payments = [];
       let expenses = [];
-      let teachers = []; // PENAMBAHAN: State untuk data pengajar
+      let teachers = [];
       let nextStudentId = 1;
       const dayNames = [
         "Minggu",
@@ -692,19 +947,24 @@
         "Jumat",
         "Sabtu",
       ];
-
-      // --- PENAMBAHAN: Variabel untuk menyimpan instance DataTables
       let studentsDataTable, expensesDataTable, todayClassesDataTable;
 
-      // --- Event Listeners ---
+      // --- INIT & EVENT LISTENERS ---
       document.addEventListener("DOMContentLoaded", () => {
+        // FITUR 1: Persistence Login - Cek LocalStorage
+        if (localStorage.getItem("mentora_logged_in") === "true") {
+          document.getElementById("access-modal").style.display = "none";
+          document.getElementById("main-app").style.display = "block";
+          initializeApp();
+        }
+
         document
           .getElementById("access-form")
           .addEventListener("submit", handleAccessCodeSubmit);
+        setupEventListeners();
       });
 
       function initializeApp() {
-        setupEventListeners();
         loadInitialData();
         document.getElementById("paymentDate").valueAsDate = new Date();
         document.getElementById("expenseDate").valueAsDate = new Date();
@@ -723,20 +983,46 @@
         document
           .getElementById("addExpenseForm")
           .addEventListener("submit", handleAddExpense);
+
+        // Filter DataTables (FITUR 11)
+        $("#filterTeacher").on("change", function () {
+          if (studentsDataTable) {
+            // Kolom pengajar ada di index 6
+            studentsDataTable.column(6).search(this.value).draw();
+          }
+        });
+        $("#filterStatus").on("change", function () {
+          if (studentsDataTable) {
+            // Kolom status ada di index 4 (hapus tag HTML saat nge-search)
+            studentsDataTable
+              .column(4)
+              .search(this.value ? `^${this.value}$` : "", true, false)
+              .draw();
+          }
+        });
       }
 
-      // --- Fungsi Otentikasi ---
+      // --- AUTHENTICATION & LOGOUT ---
       async function handleAccessCodeSubmit(e) {
         e.preventDefault();
         const inputCode = document.getElementById("access-code").value;
         const errorP = document.getElementById("access-error");
         errorP.textContent = "";
-        if (!inputCode) {
-          errorP.textContent = "Kode akses tidak boleh kosong.";
-          return;
-        }
+
+        if (!inputCode) return;
+
         const hashedInput = await sha256(inputCode);
         if (hashedInput === CORRECT_HASH) {
+          // FITUR 1: Set LocalStorage
+          localStorage.setItem("mentora_logged_in", "true");
+
+          Swal.fire({
+            icon: "success",
+            title: "Akses Diberikan",
+            showConfirmButton: false,
+            timer: 1000,
+          });
+
           document.getElementById("access-modal").style.display = "none";
           document.getElementById("main-app").style.display = "block";
           initializeApp();
@@ -746,12 +1032,28 @@
         }
       }
 
-      // --- PENAMBAHAN: Fungsi untuk animasi loading tombol ---
+      function handleLogout() {
+        Swal.fire({
+          title: "Keluar dari aplikasi?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#ef4444",
+          cancelButtonColor: "#9ca3af",
+          confirmButtonText: "Ya, Logout",
+          cancelButtonText: "Batal",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            localStorage.removeItem("mentora_logged_in");
+            location.reload();
+          }
+        });
+      }
+
+      // --- HELPER FORMATTING & UI ---
       function setButtonLoading(button, isLoading, originalText = null) {
         if (isLoading) {
           button.disabled = true;
           button.classList.add("btn-loading");
-          // Simpan teks asli jika belum ada
           if (originalText !== null && !button.dataset.originalText) {
             button.dataset.originalText = originalText;
           }
@@ -759,17 +1061,67 @@
         } else {
           button.disabled = false;
           button.classList.remove("btn-loading");
-          // Kembalikan teks asli
           button.innerHTML = button.dataset.originalText || "Submit";
         }
       }
 
-      // --- Fungsi Utama ---
+      function formatCurrency(amount) {
+        return new Intl.NumberFormat("id-ID", {
+          style: "currency",
+          currency: "IDR",
+          minimumFractionDigits: 0,
+        }).format(amount || 0);
+      }
+
+      function formatWA(phone) {
+        if (!phone) return "";
+        let p = phone.toString().replace(/\D/g, "");
+        if (p.startsWith("0")) p = "62" + p.substring(1);
+        if (p.startsWith("8")) p = "62" + p;
+        return p;
+      }
+
+      // FITUR 6 & 5: Visual Progress Bar dan Highlight
+      function getProgressBarHTML(left, total) {
+        if (!total || isNaN(total) || isNaN(left))
+          return '<span class="text-gray-400">-</span>';
+        const done = total - left;
+        const percent = Math.min(
+          100,
+          Math.max(0, Math.round((done / total) * 100)),
+        );
+
+        let colorClass = "bg-indigo-500";
+        let textClass = "text-gray-700";
+
+        // Fitur 5 Highlight Visual
+        if (left === 0) {
+          colorClass = "bg-red-500";
+          textClass = "text-red-600 font-bold";
+        } else if (left <= 2) {
+          colorClass = "bg-yellow-500";
+          textClass = "text-yellow-600 font-bold";
+        }
+
+        return `
+            <div class="flex flex-col gap-1 w-full min-w-[120px]">
+                <div class="flex justify-between text-xs mb-1 ${textClass}">
+                    <span>Sisa: ${left}</span>
+                    <span>${percent}%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden border border-gray-100">
+                    <div class="${colorClass} h-full rounded-full transition-all duration-500" style="width: ${percent}%"></div>
+                </div>
+            </div>
+          `;
+      }
+
+      // --- DATA FETCHING ---
       async function loadInitialData() {
         document.getElementById("loading-overlay").style.display = "flex";
         try {
           const response = await fetch(
-            `${SPREADSHEET_WEB_APP_URL}?action=getAllData`
+            `${SPREADSHEET_WEB_APP_URL}?action=getAllData`,
           );
           if (!response.ok)
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -777,36 +1129,30 @@
           students = data.students || [];
           payments = data.payments || [];
           expenses = data.expenses || [];
-          teachers = data.teachers || []; // PENAMBAHAN: Ambil data pengajar
+          teachers = data.teachers || [];
 
-          if (students.length > 0) {
-            const maxId = Math.max(...students.map((s) => parseInt(s.id) || 0));
-            nextStudentId = maxId + 1;
-          } else {
-            nextStudentId = 1;
-          }
-          console.log("Data berhasil dimuat:", {
-            students,
-            payments,
-            expenses,
-            teachers,
-          });
+          nextStudentId =
+            students.length > 0
+              ? Math.max(...students.map((s) => parseInt(s.id) || 0)) + 1
+              : 1;
           renderAll();
         } catch (error) {
-          console.error("Gagal memuat data dari Spreadsheet:", error);
-          alert(
-            "Gagal memuat data dari Spreadsheet. Pastikan URL Web App benar dan sudah di-deploy dengan benar."
+          Swal.fire(
+            "Koneksi Gagal",
+            "Gagal memuat data dari Spreadsheet. Pastikan URL Web App benar.",
+            "error",
           );
         } finally {
           document.getElementById("loading-overlay").style.display = "none";
         }
       }
 
+      // --- FORM HANDLERS ---
       async function handleAddStudent(e) {
         e.preventDefault();
-        const submitButton = e.submitter;
-        const originalButtonText = submitButton.innerHTML;
-        setButtonLoading(submitButton, true, originalButtonText);
+        const btn = e.submitter;
+        const oriText = btn.innerHTML;
+        setButtonLoading(btn, true, oriText);
 
         try {
           const newStudent = {
@@ -820,49 +1166,55 @@
             createdAt: new Date().toISOString(),
             activeBatch: null,
           };
+
           const success = await saveDataToSheet("addStudent", newStudent);
           if (success) {
             students.push(newStudent);
             nextStudentId++;
             renderAll();
             e.target.reset();
-            alert("Siswa berhasil ditambahkan!");
+            Swal.fire(
+              "Berhasil!",
+              "Siswa berhasil ditambahkan ke database.",
+              "success",
+            ); // Fitur 10
           } else {
-            alert("Gagal menyimpan data siswa ke Spreadsheet.");
+            throw new Error("Gagal menyimpan");
           }
+        } catch (e) {
+          Swal.fire("Gagal", "Terjadi kesalahan saat menyimpan data.", "error");
         } finally {
-          setButtonLoading(submitButton, false);
+          setButtonLoading(btn, false);
         }
       }
 
       async function handleAddPayment(e) {
         e.preventDefault();
-        const submitButton = e.submitter;
-        const originalButtonText = submitButton.innerHTML;
-
+        const btn = e.submitter;
+        const oriText = btn.innerHTML;
         const studentId = parseInt(
-          document.getElementById("paymentStudent").value
+          document.getElementById("paymentStudent").value,
         );
         const teacherId = document.getElementById("paymentTeacher").value;
 
-        if (!studentId) {
-          alert("Silakan pilih siswa terlebih dahulu.");
-          return;
-        }
-        if (!teacherId) {
-          alert("Silakan pilih pengajar terlebih dahulu.");
+        if (!studentId || !teacherId) {
+          Swal.fire(
+            "Peringatan",
+            "Silakan pilih siswa dan pengajar terlebih dahulu.",
+            "warning",
+          );
           return;
         }
 
-        setButtonLoading(submitButton, true, originalButtonText);
+        setButtonLoading(btn, true, oriText);
 
         try {
           const totalMeetings = parseInt(
-            document.getElementById("totalMeetings").value
+            document.getElementById("totalMeetings").value,
           );
           const newPayment = {
             studentId: studentId,
-            teacherId: teacherId, // PENAMBAHAN: Sertakan ID pengajar
+            teacherId: teacherId,
             amount: parseInt(document.getElementById("paymentAmount").value),
             startDate: document.getElementById("paymentDate").value,
             studyDays: [
@@ -873,6 +1225,7 @@
             meetingsLeft: totalMeetings,
             createdAt: new Date().toISOString(),
           };
+
           const success = await saveDataToSheet("addPayment", newPayment);
           if (success) {
             payments.push(newPayment);
@@ -883,26 +1236,32 @@
                 studyDays: newPayment.studyDays,
                 meetingsLeft: newPayment.meetingsLeft,
                 totalMeetings: newPayment.totalMeetings,
-                teacherId: newPayment.teacherId, // PENAMBAHAN: Simpan ID pengajar di batch aktif
+                teacherId: newPayment.teacherId,
               };
             }
             renderAll();
             e.target.reset();
             document.getElementById("paymentDate").valueAsDate = new Date();
-            alert("Pembayaran dan jadwal berhasil dicatat!");
+            Swal.fire(
+              "Pembayaran Berhasil!",
+              "Jadwal siswa telah diupdate.",
+              "success",
+            );
           } else {
-            alert("Gagal menyimpan data pembayaran ke Spreadsheet.");
+            throw new Error("Gagal menyimpan");
           }
+        } catch (e) {
+          Swal.fire("Error", "Gagal menyimpan pembayaran", "error");
         } finally {
-          setButtonLoading(submitButton, false);
+          setButtonLoading(btn, false);
         }
       }
 
       async function handleAddExpense(e) {
         e.preventDefault();
-        const submitButton = e.submitter;
-        const originalButtonText = submitButton.innerHTML;
-        setButtonLoading(submitButton, true, originalButtonText);
+        const btn = e.submitter;
+        const oriText = btn.innerHTML;
+        setButtonLoading(btn, true, oriText);
 
         try {
           const newExpenseData = {
@@ -913,110 +1272,284 @@
             createdAt: new Date().toISOString(),
           };
 
-          if (
-            !newExpenseData.category ||
-            !newExpenseData.amount ||
-            !newExpenseData.description
-          ) {
-            alert("Harap isi semua field pengeluaran.");
-            return;
-          }
-
           const success = await saveDataToSheet("addExpense", newExpenseData);
           if (success) {
-            const expenseForLocalRender = {
+            expenses.push({
               tanggal: newExpenseData.date,
               kategori: newExpenseData.category,
               deskripsi: newExpenseData.description,
               jumlah: newExpenseData.amount,
               createdAt: newExpenseData.createdAt,
-            };
-            expenses.push(expenseForLocalRender);
+            });
             renderExpensesTable();
             e.target.reset();
             document.getElementById("expenseDate").valueAsDate = new Date();
-            alert("Pengeluaran berhasil dicatat!");
-          } else {
-            alert("Gagal menyimpan data pengeluaran ke Spreadsheet.");
-          }
+            Swal.fire("Tersimpan", "Pengeluaran dicatat.", "success");
+          } else throw new Error("Gagal");
+        } catch (e) {
+          Swal.fire("Error", "Gagal menyimpan pengeluaran", "error");
         } finally {
-          setButtonLoading(submitButton, false);
+          setButtonLoading(btn, false);
         }
       }
 
-      async function handleMarkAttendance(studentId, button) {
-        const originalButtonText = button.innerHTML;
-        setButtonLoading(button, true, originalButtonText);
+      // --- LOGIC ABSENSI ---
+      function handleMarkAttendance(studentId, button) {
+        // Fitur 10 SweetAlert Confirmation
+        const student = students.find((s) => s.id === studentId);
+        if (
+          !student ||
+          !student.activeBatch ||
+          student.activeBatch.meetingsLeft <= 0
+        )
+          return;
 
-        try {
-          const student = students.find((s) => s.id === studentId);
-          if (
-            student &&
-            student.activeBatch &&
-            student.activeBatch.meetingsLeft > 0
-          ) {
-            student.activeBatch.meetingsLeft--;
-            const success = await saveDataToSheet("updateStudent", student);
-            if (success) {
-              if (student.activeBatch.meetingsLeft === 0) {
-                alert(
-                  `Siswa ${student.name} telah menyelesaikan semua pertemuan.`
+        Swal.fire({
+          title: "Konfirmasi Kehadiran",
+          html: `Catat kehadiran untuk <strong>${student.name}</strong> hari ini?`,
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonColor: "#10b981", // green
+          cancelButtonColor: "#9ca3af",
+          confirmButtonText: '<i class="fas fa-check"></i> Ya, Hadir',
+          cancelButtonText: "Batal",
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            const oriText = button.innerHTML;
+            setButtonLoading(button, true, oriText);
+
+            try {
+              student.activeBatch.meetingsLeft--;
+              const success = await saveDataToSheet("updateStudent", student);
+              if (success) {
+                Swal.fire(
+                  "Tercatat!",
+                  `Kehadiran ${student.name} berhasil disimpan. Sisa pertemuan: ${student.activeBatch.meetingsLeft}`,
+                  "success",
                 );
-                student.activeBatch = null; // Jadikan tidak aktif setelah konfirmasi server
+                if (student.activeBatch.meetingsLeft === 0) {
+                  student.activeBatch = null;
+                }
+                renderAll();
               } else {
-                alert(
-                  `Kehadiran ${student.name} dicatat. Sisa pertemuan: ${student.activeBatch.meetingsLeft}.`
-                );
+                student.activeBatch.meetingsLeft++; // Rollback
+                throw new Error();
               }
-              renderAll();
-            } else {
-              student.activeBatch.meetingsLeft++; // Kembalikan jika gagal
-              alert("Gagal memperbarui data kehadiran di Spreadsheet.");
+            } catch (e) {
+              Swal.fire("Gagal", "Terjadi kesalahan sinkronisasi", "error");
+            } finally {
+              setButtonLoading(button, false);
             }
           }
-        } finally {
-          setButtonLoading(button, false);
-        }
+        });
       }
 
-      // --- Fungsi Render ---
+      // --- FITUR 2 & 4: WHATSAPP MESSAGING LOGIC ---
+      function openWhatsApp(phone, text) {
+        const waPhone = formatWA(phone);
+        if (!waPhone) {
+          Swal.fire(
+            "Nomor Tidak Valid",
+            "Siswa ini tidak memiliki nomor WhatsApp yang valid.",
+            "error",
+          );
+          return;
+        }
+        window.open(
+          `https://wa.me/${waPhone}?text=${encodeURIComponent(text)}`,
+          "_blank",
+        );
+      }
+
+      function sendReminder(studentId) {
+        const student = students.find((s) => s.id === studentId);
+        if (!student || !student.activeBatch) return;
+
+        const teacherName = getTeacherNameById(student.activeBatch.teacherId);
+        const todayName = dayNames[new Date().getDay()];
+        const total = parseInt(student.activeBatch.totalMeetings) || 0;
+        const left = parseInt(student.activeBatch.meetingsLeft) || 0;
+        const meetKe = total - left + 1;
+
+        const text = `Halo Ayah/Bunda ${student.name}
+Reminder kelas Mentora hari ini.
+====================
+Kelas      : ${student.classType}
+Pengajar   : ${teacherName}
+Hari       : ${todayName}
+Pertemuan  : ${meetKe}
+====================
+Sampai jumpa
+Mentora Language Centre`;
+
+        openWhatsApp(student.phone, text);
+
+        // Fitur 3: Set Status Reminder LocalStorage
+        const todayStr = new Date().toISOString().split("T")[0];
+        localStorage.setItem(`reminder_${todayStr}_${studentId}`, "true");
+
+        renderClassesTable();
+        updateDashboard(); // update counter di dashboard operasional
+      }
+
+      function sendFollowUp(studentId) {
+        const student = students.find((s) => s.id === studentId);
+        if (!student || !student.activeBatch) return;
+        const left = student.activeBatch.meetingsLeft;
+        const text = `Halo Ayah/Bunda
+Menginformasikan bahwa sisa pertemuan ${student.name} tinggal *${left}x* lagi.
+Silakan melakukan pembayaran untuk batch berikutnya agar jadwal tetap aman.
+Terima kasih.
+Mentora Language Centre`;
+        openWhatsApp(student.phone, text);
+      }
+
+      // Fitur 7: Quick Actions Routing
+      function goToPayment(studentId) {
+        switchTab("payments");
+        setTimeout(() => {
+          document.getElementById("paymentStudent").value = studentId;
+        }, 200);
+      }
+
+      // Fitur 8: Modal Detail Siswa (SweetAlert2 custom)
+      function showStudentDetail(id) {
+        const student = students.find((s) => s.id === id);
+        if (!student) return;
+
+        const batch = student.activeBatch;
+        const teacherName = batch ? getTeacherNameById(batch.teacherId) : "-";
+        const progressHTML = batch
+          ? getProgressBarHTML(batch.meetingsLeft, batch.totalMeetings)
+          : '<span class="text-sm text-gray-400">Tidak ada paket aktif</span>';
+
+        // History Pembayaran
+        const studPayments = payments
+          .filter((p) => p.studentId === id)
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        let paymentHTML = studPayments
+          .map(
+            (p) => `
+              <li class="border-b pb-2 mb-2 last:border-0 text-sm">
+                  <div class="flex justify-between items-center text-gray-700">
+                      <span class="font-semibold text-green-600">${formatCurrency(p.amount)}</span>
+                      <span class="text-xs text-gray-500"><i class="fas fa-calendar-alt"></i> ${new Date(p.createdAt).toLocaleDateString("id-ID")}</span>
+                  </div>
+                  <div class="text-xs text-gray-500 mt-1">Berlaku: ${p.startDate} | ${p.totalMeetings}x Pertemuan</div>
+              </li>`,
+          )
+          .join("");
+
+        if (!paymentHTML)
+          paymentHTML =
+            '<div class="text-center text-gray-400 text-sm py-4">Belum ada riwayat pembayaran</div>';
+
+        Swal.fire({
+          html: `
+                  <div class="text-left mt-2">
+                      <div class="flex items-center gap-4 mb-6 border-b pb-4">
+                          <div class="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center text-2xl font-bold text-indigo-600">
+                              ${student.name.substring(0, 2).toUpperCase()}
+                          </div>
+                          <div>
+                              <h2 class="text-2xl font-extrabold text-gray-800">${student.name}</h2>
+                              <span class="px-2 py-0.5 rounded text-xs font-semibold ${student.classType === "Reguler" ? "bg-blue-100 text-blue-700" : "bg-purple-100 text-purple-700"}">${student.classType}</span>
+                              <span class="px-2 py-0.5 rounded text-xs font-semibold bg-gray-100 text-gray-600">${student.level}</span>
+                          </div>
+                      </div>
+                      
+                      <div class="grid grid-cols-2 gap-4 mb-6 text-sm">
+                          <div class="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                              <p class="text-gray-500 text-xs uppercase tracking-wider mb-1"><i class="fab fa-whatsapp"></i> WhatsApp</p>
+                              <p class="font-semibold text-gray-800">${student.phone || "-"}</p>
+                          </div>
+                          <div class="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                              <p class="text-gray-500 text-xs uppercase tracking-wider mb-1"><i class="fas fa-school"></i> Sekolah</p>
+                              <p class="font-semibold text-gray-800">${student.school || "-"}</p>
+                          </div>
+                      </div>
+
+                      <div class="mb-6 p-4 rounded-xl border ${batch ? "bg-indigo-50 border-indigo-100" : "bg-gray-50 border-gray-200"}">
+                          <h4 class="font-bold text-gray-700 mb-2 flex items-center gap-2"><i class="fas fa-book-open text-indigo-500"></i> Paket Berjalan</h4>
+                          <p class="text-sm text-gray-700 mb-3"><strong>Pengajar:</strong> ${teacherName}</p>
+                          ${progressHTML}
+                      </div>
+
+                      <div>
+                          <h4 class="font-bold text-gray-700 mb-3 flex items-center gap-2"><i class="fas fa-history text-gray-500"></i> Riwayat Transaksi</h4>
+                          <ul class="max-h-40 overflow-y-auto bg-gray-50 rounded-lg p-3 border border-gray-100">${paymentHTML}</ul>
+                      </div>
+                  </div>
+              `,
+          showCloseButton: true,
+          showConfirmButton: false,
+          customClass: { popup: "rounded-2xl shadow-2xl" },
+          width: "500px",
+        });
+      }
+
+      // --- RENDER LOGIC ---
       function renderAll() {
-        updateDashboard();
+        updateFilterDropdowns();
         renderStudentsTable();
         renderClassesTable();
         renderExpensesTable();
-        renderClassGroups(); // PENAMBAHAN
+        renderClassGroups();
         updatePaymentStudentOptions();
-        updatePaymentTeacherOptions(); // PENAMBAHAN
+        updatePaymentTeacherOptions();
+        updateDashboard();
       }
 
-      function formatCurrency(amount) {
-        return new Intl.NumberFormat("id-ID", {
-          style: "currency",
-          currency: "IDR",
-          minimumFractionDigits: 0,
-        }).format(amount || 0);
+      function getReminderStatus(studentId) {
+        const todayStr = new Date().toISOString().split("T")[0];
+        return (
+          localStorage.getItem(`reminder_${todayStr}_${studentId}`) === "true"
+        );
       }
 
       function updateDashboard() {
         const activeStudentsList = students.filter(
-          (s) => s.activeBatch && s.activeBatch.meetingsLeft > 0
+          (s) => s.activeBatch && s.activeBatch.meetingsLeft > 0,
         );
+        const todayClassList = getTodayClasses();
+
+        // Counter Standar
         document.getElementById("activeStudents").textContent =
           activeStudentsList.length;
         document.getElementById("regularStudents").textContent =
           activeStudentsList.filter((s) => s.classType === "Reguler").length;
         document.getElementById("intensiveStudents").textContent =
           activeStudentsList.filter((s) => s.classType === "Intensive").length;
-        document.getElementById("todayClasses").textContent =
-          getTodayClasses().length;
+        document.getElementById("todayClassesCount").textContent =
+          todayClassList.length;
+
+        // Fitur 9: Counter Operasional
+        const belumReminder = todayClassList.filter(
+          (s) => !getReminderStatus(s.id),
+        ).length;
+        const hampirHabis = activeStudentsList.filter(
+          (s) => s.activeBatch.meetingsLeft <= 2,
+        ).length;
+        const pengajarUnik = new Set(
+          todayClassList.map((s) => s.activeBatch.teacherId),
+        ).size;
+
+        document.getElementById("opBelumReminder").textContent = belumReminder;
+        document.getElementById("opHampirHabis").textContent = hampirHabis;
+        document.getElementById("opPengajarAktif").textContent = pengajarUnik;
+      }
+
+      function updateFilterDropdowns() {
+        const teacherSelect = document.getElementById("filterTeacher");
+        teacherSelect.innerHTML = '<option value="">Semua Pengajar</option>';
+        teachers.forEach((t) => {
+          teacherSelect.innerHTML += `<option value="${t.nama_pengajar}">${t.nama_pengajar}</option>`;
+        });
       }
 
       function renderStudentsTable() {
-        if ($.fn.DataTable.isDataTable("#studentsDataTable")) {
+        if ($.fn.DataTable.isDataTable("#studentsDataTable"))
           $("#studentsDataTable").DataTable().destroy();
-        }
-
         const tbody = document.getElementById("studentsTableBody");
         tbody.innerHTML = "";
 
@@ -1028,8 +1561,8 @@
             status === "Aktif"
               ? "bg-green-100 text-green-800"
               : "bg-red-100 text-red-800";
-
           let schedule = "-";
+
           if (
             batch &&
             Array.isArray(batch.studyDays) &&
@@ -1037,92 +1570,64 @@
           ) {
             schedule = batch.studyDays
               .map((dayIndex) => dayNames[dayIndex] || "")
-              .join(" & ");
+              .join(", ");
           }
 
           const teacherName = batch ? getTeacherNameById(batch.teacherId) : "-";
+          const progressHTML = batch
+            ? getProgressBarHTML(batch.meetingsLeft, batch.totalMeetings)
+            : '<span class="text-xs text-gray-400">N/A</span>';
+
+          // Fitur 7 & 8: Quick Action Buttons & Name click
+          const actionHTML = `
+              <div class="flex gap-1 justify-center">
+                  <button onclick="openWhatsApp('${s.phone}', 'Halo ${s.name}, ')" class="p-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-600 hover:text-white transition tooltip" title="WhatsApp"><i class="fab fa-whatsapp text-lg"></i></button>
+                  <button onclick="goToPayment(${s.id})" class="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition tooltip" title="Catat Bayar"><i class="fas fa-wallet text-lg"></i></button>
+                  <button onclick="showStudentDetail(${s.id})" class="p-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-600 hover:text-white transition tooltip" title="Detail"><i class="fas fa-info-circle text-lg"></i></button>
+              </div>
+          `;
+
+          // Fitur 4: Warning follow up icon jika <= 2 (menempel di nama)
+          let warningIcon = "";
+          if (batch && batch.meetingsLeft <= 2 && batch.meetingsLeft > 0) {
+            warningIcon = `<i class="fas fa-exclamation-circle text-yellow-500 ml-1 tooltip" title="Hampir Habis!"></i>`;
+          } else if (batch && batch.meetingsLeft === 0) {
+            warningIcon = `<i class="fas fa-times-circle text-red-500 ml-1 tooltip" title="Jatah Habis!"></i>`;
+          }
 
           const row = `
-            <tr class="border-b hover:bg-gray-50">
-              <td class="p-4">${s.id}</td>
-              <td class="p-4 font-semibold text-gray-800">${
-                s.name
-              }<br><span class="text-sm text-gray-500 font-normal">${
-            s.school || ""
-          }</span></td>
-              <td class="p-4">${s.level}</td>
-              <td class="p-4"><span class="px-2 py-1 rounded-full text-sm font-semibold ${
-                s.classType === "Reguler"
-                  ? "bg-blue-100 text-blue-800"
-                  : "bg-purple-100 text-purple-800"
-              }">${s.classType}</span></td>
-              <td class="p-4"><span class="px-2 py-1 rounded-full text-sm font-semibold ${statusColor}">${status}</span></td>
-              <td class="p-4">${schedule}</td>
-              <td class="p-4">${teacherName}</td>
-              <td class="p-4 font-bold text-indigo-600">${
-                batch ? batch.meetingsLeft : "-"
-              }</td>
+            <tr>
+              <td class="p-4 text-gray-500 text-sm">${s.id}</td>
+              <td class="p-4">
+                  <a href="#" onclick="showStudentDetail(${s.id}); return false;" class="font-bold text-indigo-700 hover:underline inline-flex items-center gap-1">${s.name} ${warningIcon}</a>
+                  <div class="text-xs text-gray-500 mt-1"><i class="fas fa-school w-3"></i> ${s.school || "-"}</div>
+              </td>
+              <td class="p-4 text-sm">${s.level}</td>
+              <td class="p-4"><span class="px-2.5 py-1 rounded-md text-xs font-bold ${s.classType === "Reguler" ? "bg-blue-50 text-blue-600 border border-blue-100" : "bg-purple-50 text-purple-600 border border-purple-100"}">${s.classType}</span></td>
+              <td class="p-4"><span class="px-2.5 py-1 rounded-md text-xs font-bold ${statusColor}">${status}</span></td>
+              <td class="p-4 text-sm text-gray-600">${schedule}</td>
+              <td class="p-4 text-sm font-medium text-gray-700">${teacherName}</td>
+              <td class="p-4">${progressHTML}</td>
+              <td class="p-4">${actionHTML}</td>
             </tr>
           `;
           tbody.innerHTML += row;
         });
 
-        // Inisialisasi DataTable
         studentsDataTable = $("#studentsDataTable").DataTable({
           responsive: true,
+          pageLength: 10,
           language: {
             url: "https://cdn.datatables.net/plug-ins/2.0.8/i18n/id.json",
           },
-        });
-      }
-
-      function renderExpensesTable() {
-        if ($.fn.DataTable.isDataTable("#expensesDataTable")) {
-          $("#expensesDataTable").DataTable().destroy();
-        }
-        const tbody = document.getElementById("expensesTableBody");
-        tbody.innerHTML = "";
-
-        const sortedExpenses = [...expenses].sort(
-          (a, b) => new Date(b.tanggal) - new Date(a.tanggal)
-        );
-
-        sortedExpenses.forEach((exp) => {
-          if (!exp.tanggal) return;
-          const expenseDate = new Date(exp.tanggal).toLocaleDateString(
-            "id-ID",
-            {
-              day: "2-digit",
-              month: "long",
-              year: "numeric",
-            }
-          );
-          const row = `
-            <tr class="border-b hover:bg-gray-50">
-              <td class="p-4">${expenseDate}</td>
-              <td class="p-4 font-semibold text-gray-800">${exp.kategori}</td>
-              <td class="p-4">${exp.deskripsi}</td>
-              <td class="p-4 font-semibold text-red-600">${formatCurrency(
-                exp.jumlah
-              )}</td>
-            </tr>
-          `;
-          tbody.innerHTML += row;
-        });
-
-        expensesDataTable = $("#expensesDataTable").DataTable({
-          responsive: true,
-          order: [[0, "desc"]],
-          language: {
-            url: "https://cdn.datatables.net/plug-ins/2.0.8/i18n/id.json",
-          },
+          columnDefs: [{ orderable: false, targets: 8 }], // Disable sorting di kolom aksi
         });
       }
 
       function renderClassesTable() {
-        if ($.fn.DataTable.isDataTable("#todayClassesDataTable")) {
+        if ($.fn.DataTable.isDataTable("#todayClassesDataTable"))
           $("#todayClassesDataTable").DataTable().destroy();
-        }
+
         const today = new Date();
         document.getElementById("todayDate").textContent =
           today.toLocaleDateString("id-ID", {
@@ -1133,26 +1638,49 @@
           });
         const tbody = document.getElementById("todayClassesTableBody");
         tbody.innerHTML = "";
+
         const todayClasses = getTodayClasses();
 
         todayClasses.forEach((s) => {
-          const totalMeetings = parseInt(s.activeBatch.totalMeetings, 10) || 0;
-          const meetingsLeft = parseInt(s.activeBatch.meetingsLeft, 10) || 0;
-          const meetingNumber = totalMeetings - meetingsLeft + 1;
           const teacherName = getTeacherNameById(s.activeBatch.teacherId);
+          const progressHTML = getProgressBarHTML(
+            s.activeBatch.meetingsLeft,
+            s.activeBatch.totalMeetings,
+          );
+
+          // Fitur 3: Status Reminder & Fitur 2: Tombol Reminder
+          const isReminded = getReminderStatus(s.id);
+          const reminderBadge = isReminded
+            ? `<span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold flex items-center justify-center gap-1 w-max mx-auto"><i class="fas fa-check-circle"></i> Sudah</span>`
+            : `<span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold flex items-center justify-center gap-1 w-max mx-auto"><i class="fas fa-times-circle"></i> Belum</span>`;
+
+          const reminderBtnClass = isReminded
+            ? "bg-gray-100 text-gray-500 hover:bg-gray-200"
+            : "bg-indigo-100 text-indigo-700 hover:bg-indigo-600 hover:text-white border border-indigo-200";
+
           const row = `
-            <tr class="border-b hover:bg-gray-50">
-              <td class="p-4 font-semibold text-gray-800">${s.name}</td>
-              <td class="p-4"><span class="px-2 py-1 rounded-full text-sm font-semibold ${
-                s.classType === "Reguler"
-                  ? "bg-blue-100 text-blue-800"
-                  : "bg-purple-100 text-purple-800"
-              }">${s.classType}</span></td>
-              <td class="p-4">${teacherName}</td>
-              <td class="p-4">${meetingNumber} dari ${totalMeetings}</td>
-              <td class="p-4"><button onclick="handleMarkAttendance(${
-                s.id
-              }, this)" class="bg-green-500 text-white font-bold py-1 px-3 rounded hover:bg-green-600 flex items-center justify-center"><span class="btn-text">Catat Hadir</span></button></td>
+            <tr>
+              <td class="p-4">
+                  <span class="font-bold text-gray-800 block">${s.name}</span>
+                  <!-- Fitur 4 Follow Up Button (Muncul jika <= 2 sisa) -->
+                  ${s.activeBatch.meetingsLeft <= 2 ? `<button onclick="sendFollowUp(${s.id})" class="mt-1 text-xs text-yellow-600 hover:text-yellow-700 font-semibold bg-yellow-50 px-2 py-0.5 rounded border border-yellow-200"><i class="fab fa-whatsapp"></i> Follow Up Bayar!</button>` : ""}
+              </td>
+              <td class="p-4"><span class="px-2 py-1 rounded text-xs font-semibold ${s.classType === "Reguler" ? "bg-blue-50 text-blue-600" : "bg-purple-50 text-purple-600"}">${s.classType}</span></td>
+              <td class="p-4 text-sm">${teacherName}</td>
+              <td class="p-4">${progressHTML}</td>
+              <td class="p-4 text-center">
+                  <div class="flex flex-col items-center gap-2">
+                      ${reminderBadge}
+                      <button onclick="sendReminder(${s.id})" class="w-full text-xs py-1.5 rounded transition ${reminderBtnClass} font-semibold flex items-center justify-center gap-1">
+                          <i class="fab fa-whatsapp"></i> ${isReminded ? "Kirim Ulang" : "Kirim Reminder"}
+                      </button>
+                  </div>
+              </td>
+              <td class="p-4 text-center">
+                  <button onclick="handleMarkAttendance(${s.id}, this)" class="bg-teal-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-teal-600 hover:shadow-md transition flex items-center justify-center w-full gap-2 text-sm">
+                      <i class="fas fa-clipboard-check"></i> <span class="btn-text">Hadir</span>
+                  </button>
+              </td>
             </tr>
           `;
           tbody.innerHTML += row;
@@ -1165,16 +1693,52 @@
           info: false,
           language: {
             url: "https://cdn.datatables.net/plug-ins/2.0.8/i18n/id.json",
+            emptyTable: "Tidak ada jadwal kelas untuk hari ini.",
           },
         });
       }
 
-      // PENAMBAHAN: Fungsi untuk render kelompok kelas
+      function renderExpensesTable() {
+        if ($.fn.DataTable.isDataTable("#expensesDataTable"))
+          $("#expensesDataTable").DataTable().destroy();
+        const tbody = document.getElementById("expensesTableBody");
+        tbody.innerHTML = "";
+
+        const sortedExpenses = [...expenses].sort(
+          (a, b) => new Date(b.tanggal) - new Date(a.tanggal),
+        );
+        sortedExpenses.forEach((exp) => {
+          if (!exp.tanggal) return;
+          const expenseDate = new Date(exp.tanggal).toLocaleDateString(
+            "id-ID",
+            { day: "2-digit", month: "short", year: "numeric" },
+          );
+          const row = `
+            <tr>
+              <td class="p-4 text-sm text-gray-600">${expenseDate}</td>
+              <td class="p-4"><span class="font-semibold text-gray-800 bg-gray-100 px-2 py-1 rounded text-xs border">${exp.kategori}</span></td>
+              <td class="p-4 text-sm">${exp.deskripsi}</td>
+              <td class="p-4 font-bold text-red-500">${formatCurrency(exp.jumlah)}</td>
+            </tr>
+          `;
+          tbody.innerHTML += row;
+        });
+
+        expensesDataTable = $("#expensesDataTable").DataTable({
+          responsive: true,
+          order: [[0, "desc"]],
+          pageLength: 5,
+          language: {
+            url: "https://cdn.datatables.net/plug-ins/2.0.8/i18n/id.json",
+          },
+        });
+      }
+
       function renderClassGroups() {
         const container = document.getElementById("classGroupsContainer");
         container.innerHTML = "";
         if (teachers.length === 0) {
-          container.innerHTML = `<p class="text-gray-500 col-span-full">Belum ada data pengajar. Silakan tambahkan di sheet 'Pengajar'.</p>`;
+          container.innerHTML = `<div class="col-span-full p-8 text-center bg-gray-50 rounded-xl border border-dashed border-gray-300 text-gray-500"><i class="fas fa-box-open text-3xl mb-3 block"></i>Belum ada data pengajar.</div>`;
           return;
         }
 
@@ -1183,47 +1747,45 @@
             (s) =>
               s.activeBatch &&
               s.activeBatch.meetingsLeft > 0 &&
-              s.activeBatch.teacherId === teacher.id_pengajar
+              s.activeBatch.teacherId === teacher.id_pengajar,
           );
+          let studentsListHtml = `<div class="text-sm text-gray-400 italic py-2 text-center">Kosong</div>`;
 
-          let studentsListHtml = `<p class="text-sm text-gray-500">Belum ada siswa aktif.</p>`;
           if (activeStudentsForTeacher.length > 0) {
             studentsListHtml = activeStudentsForTeacher
               .map(
                 (student) => `
-                    <li class="flex justify-between items-center py-1">
-                        <span>${student.name} <span class="text-xs text-gray-400">(${student.classType})</span></span>
-                        <span class="font-semibold text-indigo-600">${student.activeBatch.meetingsLeft} sisa</span>
-                    </li>
-                `
+                <li class="flex flex-col py-2 border-b border-gray-50 last:border-0 hover:bg-gray-50 px-2 rounded transition">
+                    <div class="flex justify-between items-center w-full">
+                        <span class="font-semibold text-gray-700 text-sm">${student.name} <span class="px-1.5 py-0.5 bg-gray-200 text-gray-600 rounded text-[10px] ml-1">${student.classType}</span></span>
+                    </div>
+                    ${getProgressBarHTML(student.activeBatch.meetingsLeft, student.activeBatch.totalMeetings)}
+                </li>
+            `,
               )
               .join("");
           }
 
           const cardHtml = `
-            <div class="bg-white p-4 rounded-lg shadow-md border border-gray-200">
-                <div class="flex items-center mb-3">
-                    <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-xl mr-4">
-                        ${teacher.nama_pengajar.substring(0, 2)}
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 hover:shadow-md transition">
+                <div class="flex items-center gap-4 mb-4 bg-indigo-50/50 p-3 rounded-xl border border-indigo-50">
+                    <div class="w-12 h-12 rounded-full bg-indigo-500 text-white flex items-center justify-center font-bold text-xl shadow-inner">
+                        ${teacher.nama_pengajar.substring(0, 2).toUpperCase()}
                     </div>
                     <div>
-                        <h4 class="font-bold text-lg text-gray-800">${
-                          teacher.nama_pengajar
-                        }</h4>
-                        <p class="text-sm text-gray-500">${
-                          teacher.spesialisasi || "Tanpa Spesialisasi"
-                        }</p>
+                        <h4 class="font-bold text-gray-800 leading-tight">${teacher.nama_pengajar}</h4>
+                        <p class="text-xs text-indigo-600 font-semibold bg-indigo-100 px-2 py-0.5 rounded w-max mt-1">${teacher.spesialisasi || "Umum"}</p>
                     </div>
                 </div>
-                <hr class="my-3">
-                <h5 class="font-semibold text-gray-700 mb-2">Siswa Aktif (${
-                  activeStudentsForTeacher.length
-                }):</h5>
-                <ul class="space-y-1 text-sm list-disc list-inside">
+                <div class="flex justify-between items-center mb-2 px-2">
+                    <h5 class="text-xs font-bold text-gray-500 uppercase tracking-wider">Murid Aktif</h5>
+                    <span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-2 py-1 rounded-full">${activeStudentsForTeacher.length}</span>
+                </div>
+                <ul class="space-y-1 bg-white border border-gray-100 rounded-lg max-h-48 overflow-y-auto custom-scrollbar">
                     ${studentsListHtml}
                 </ul>
             </div>
-            `;
+          `;
           container.innerHTML += cardHtml;
         });
       }
@@ -1238,7 +1800,6 @@
           });
       }
 
-      // PENAMBAHAN: Fungsi untuk mengisi dropdown pengajar
       function updatePaymentTeacherOptions() {
         const select = document.getElementById("paymentTeacher");
         select.innerHTML = '<option value="">Pilih Pengajar...</option>';
@@ -1249,18 +1810,20 @@
           });
       }
 
-      // --- Fungsi Utilitas ---
+      // --- UTILS ---
       function switchTab(tabName) {
         document
           .querySelectorAll(".tab-content")
           .forEach((c) => c.classList.remove("active"));
         document.getElementById(tabName).classList.add("active");
+
         document.querySelectorAll(".nav-tab").forEach((t) => {
-          t.classList.toggle("active", t.dataset.tab === tabName);
-          t.classList.toggle("text-indigo-600", t.dataset.tab === tabName);
-          t.classList.toggle("border-indigo-600", t.dataset.tab === tabName);
-          t.classList.toggle("text-gray-600", t.dataset.tab !== tabName);
-          t.classList.toggle("border-transparent", t.dataset.tab !== tabName);
+          const isActive = t.dataset.tab === tabName;
+          t.classList.toggle("text-indigo-600", isActive);
+          t.classList.toggle("border-indigo-600", isActive);
+          t.classList.toggle("bg-gray-100", isActive);
+          t.classList.toggle("text-gray-500", !isActive);
+          t.classList.toggle("border-transparent", !isActive);
         });
       }
 
@@ -1271,11 +1834,10 @@
             s.activeBatch &&
             s.activeBatch.meetingsLeft > 0 &&
             Array.isArray(s.activeBatch.studyDays) &&
-            s.activeBatch.studyDays.includes(todayDayOfWeek)
+            s.activeBatch.studyDays.includes(todayDayOfWeek),
         );
       }
 
-      // PENAMBAHAN: Fungsi helper untuk mendapatkan nama pengajar
       function getTeacherNameById(teacherId) {
         if (!teacherId) return "N/A";
         const teacher = teachers.find((t) => t.id_pengajar === teacherId);
@@ -1292,17 +1854,16 @@
               mode: "cors",
               headers: { "Content-Type": "text/plain" },
               body: JSON.stringify(data),
-            }
+            },
           );
           if (!response.ok)
             throw new Error(`HTTP error! status: ${response.status}`);
           const result = await response.json();
           if (result.status !== "success")
-            throw new Error(result.message || "Unknown error from Apps Script");
-          console.log(`Action '${action}' successful:`, result);
+            throw new Error(result.message || "Error server");
           return true;
         } catch (error) {
-          console.error(`Error during action '${action}':`, error);
+          console.error(error);
           return false;
         } finally {
           document.getElementById("loading-overlay").style.display = "none";
@@ -1312,13 +1873,10 @@
       async function sha256(message) {
         const msgBuffer = new TextEncoder().encode(message);
         const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashHex = hashArray
+        return Array.from(new Uint8Array(hashBuffer))
           .map((b) => b.toString(16).padStart(2, "0"))
           .join("");
-        return hashHex;
       }
     </script>
   </body>
 </html>
-
